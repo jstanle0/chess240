@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Objects;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -8,7 +10,7 @@ package chess;
  */
 public class ChessBoard {
 
-    private final ChessPiece[][] board;
+    private ChessPiece[][] board;
     public ChessBoard() {
         board = new ChessPiece[8][8];
     }
@@ -20,8 +22,8 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        int row = position.getRow();
-        int col = position.getColumn();
+        int row = position.getRow() - 1;
+        int col = position.getColumn() - 1;
         if (row > 8 || row < 0 || col > 8 || col < 0) {
             throw new RuntimeException("Invalid position");
         }
@@ -40,7 +42,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[position.getRow()][position.getColumn()];
+        return board[position.getRow()-1][position.getColumn()-1];
     }
 
     /**
@@ -48,6 +50,46 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        board = BoardStates.defaultState();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != ChessBoard.class) {
+            return false;
+        }
+        ChessBoard otherCB = (ChessBoard) obj;
+        for(int i = 0; i < this.board.length; i++) {
+            for(int j = 0; j < this.board[i].length; j++) {
+                if (!Objects.equals(otherCB.board[i][j], this.board[i][j])) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < this.board.length; i++) {
+            sb.append("| ");
+            for(int j = 0; j < this.board[i].length; j++) {
+               sb.append(this.board[i][j]);
+               sb.append(" | ");
+            }
+            if (i < this.board.length - 1) {
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.toString());
     }
 }
