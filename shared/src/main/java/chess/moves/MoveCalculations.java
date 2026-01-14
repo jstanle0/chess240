@@ -18,7 +18,14 @@ public class MoveCalculations {
         ALL
     }
 
-    private static List<ChessPosition> followLine(int maxLength, int rowIter, int columnIter, ChessBoard board, ChessPosition currentPos, ChessGame.TeamColor color) {
+    private static List<ChessPosition> followLine(
+            int maxLength,
+            int rowIter,
+            int columnIter,
+            ChessBoard board,
+            ChessPosition currentPos,
+            ChessGame.TeamColor color
+    ) {
         List<ChessPosition> output = new ArrayList<>();
         for (int i = 1; i <= maxLength; i++) {
             ChessPosition nextPos = currentPos.add(rowIter * i, columnIter * i);
@@ -39,7 +46,13 @@ public class MoveCalculations {
         return output;
     }
 
-    public static List<ChessPosition> getDiagonals(int maxLength, MoveDirection direction, ChessBoard board, ChessPosition currentPos, ChessGame.TeamColor color) {
+    public static List<ChessPosition> getDiagonals(
+            int maxLength,
+            MoveDirection direction,
+            ChessBoard board,
+            ChessPosition currentPos,
+            ChessGame.TeamColor color
+    ) {
         //Instantiate booleans for each direction. They determine if a given direction is valid to move in.
         boolean up = direction == MoveDirection.ALL || direction == MoveDirection.UP;
         boolean down = direction == MoveDirection.ALL || direction == MoveDirection.DOWN;
@@ -57,7 +70,13 @@ public class MoveCalculations {
         return output;
     }
 
-    public static List<ChessPosition> getStraight(int maxLength, MoveDirection direction, ChessBoard board, ChessPosition currentPos, ChessGame.TeamColor color) {
+    public static List<ChessPosition> getStraight(
+            int maxLength,
+            MoveDirection direction,
+            ChessBoard board,
+            ChessPosition currentPos,
+            ChessGame.TeamColor color
+    ) {
         boolean up = direction == MoveDirection.ALL || direction == MoveDirection.UP;
         boolean down = direction == MoveDirection.ALL || direction == MoveDirection.DOWN;
 

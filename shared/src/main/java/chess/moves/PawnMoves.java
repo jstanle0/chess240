@@ -6,11 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PawnMoves {
-    public static ChessPiece.PieceType[] possiblePromotions = {ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.ROOK, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT};
+    public static ChessPiece.PieceType[] possiblePromotions = {
+            ChessPiece.PieceType.QUEEN,
+            ChessPiece.PieceType.ROOK,
+            ChessPiece.PieceType.BISHOP,
+            ChessPiece.PieceType.KNIGHT
+    };
 
     public static List<ChessMove> getMoves(ChessPiece pawn, ChessBoard board, ChessPosition position) {
         List<ChessMove> output = new ArrayList<>();
-        var moveDirection = (pawn.getTeamColor() == ChessGame.TeamColor.WHITE) ? MoveCalculations.MoveDirection.UP : MoveCalculations.MoveDirection.DOWN;
+        var moveDirection = (pawn.getTeamColor() == ChessGame.TeamColor.WHITE)
+                ? MoveCalculations.MoveDirection.UP
+                : MoveCalculations.MoveDirection.DOWN;
 
         List<ChessPosition> diagonalMoves = MoveCalculations.getDiagonals(1, moveDirection, board, position, pawn.getTeamColor());
         for (ChessPosition move : diagonalMoves) {
@@ -21,8 +28,8 @@ public class PawnMoves {
         }
 
         int straightLength = 1;
-        // Check if it's the first move for the pawn. This can be determined from position since pawns don't move backwards.
-        if ((pawn.getTeamColor() == ChessGame.TeamColor.WHITE && position.getRow() == 2) || (pawn.getTeamColor() == ChessGame.TeamColor.BLACK && position.getRow() == 7)) {
+        // Check for a double move. This can be determined from position since pawns moving the other direction hit the end of the board.
+        if (position.getRow() == 2 || position.getRow() == 7) {
             straightLength = 2;
         }
         List<ChessPosition> straightMoves = MoveCalculations.getStraight(straightLength, moveDirection, board, position, pawn.getTeamColor());

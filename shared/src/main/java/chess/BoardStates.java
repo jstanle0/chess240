@@ -10,7 +10,14 @@ public class BoardStates {
             board[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
         }
 
-        ChessPiece.PieceType[] placementOrder = {ChessPiece.PieceType.ROOK, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.KING};
+        ChessPiece.PieceType[] placementOrder = {
+                ChessPiece.PieceType.ROOK,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.BISHOP,
+                ChessPiece.PieceType.QUEEN,
+                ChessPiece.PieceType.KING
+        };
+
         for (int i = 0; i < 5; i++) {
             board[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, placementOrder[i]);
             board[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, placementOrder[i]);
