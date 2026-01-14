@@ -8,6 +8,6 @@ import java.util.List;
 
 public class KnightMoves {
     public static List<ChessPosition> getMoves(ChessPiece bishop, ChessBoard board, ChessPosition position) {
-        return MoveCalculations.getLs(1, MoveCalculations.MoveDirection.ALL, board, position, bishop.getTeamColor());
+        return MoveCalculations.getLs(1, board, position, bishop.getTeamColor());
     }
 }

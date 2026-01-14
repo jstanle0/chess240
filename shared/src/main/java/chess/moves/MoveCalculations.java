@@ -21,7 +21,7 @@ public class MoveCalculations {
         List<ChessPosition> output = new ArrayList<>();
         for (int i = 1; i <= maxLength; i++) {
             ChessPosition nextPos = currentPos.add(rowIter * i, columnIter * i);
-            if (!board.verifyPosition(nextPos)) {
+            if (board.verifyPosition(nextPos)) {
                 break;
             }
             ChessPiece piece = board.getPiece(nextPos);
@@ -75,7 +75,7 @@ public class MoveCalculations {
         return output;
     }
 
-    public static List<ChessPosition> getLs(int maxLength, MoveDirection direction, ChessBoard board, ChessPosition currentPos, ChessGame.TeamColor color) {
+    public static List<ChessPosition> getLs(int maxLength, ChessBoard board, ChessPosition currentPos, ChessGame.TeamColor color) {
         List<ChessPosition> output = new ArrayList<>();
 
         //For simplicity, this is a list of possible displacements a knight can make. Then each one is iterated over.
