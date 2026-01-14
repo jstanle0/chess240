@@ -1,6 +1,8 @@
 package chess;
 
 import chess.moves.BishopMoves;
+import chess.moves.KingMoves;
+import chess.moves.RookMoves;
 
 import java.util.*;
 
@@ -59,6 +61,8 @@ public class ChessPiece {
         PieceType promotionPiece = null;
         switch (type) {
             case BISHOP -> validPositions = BishopMoves.getMoves(this, board, myPosition);
+            case ROOK -> validPositions = RookMoves.getMoves(this, board, myPosition);
+            case KING -> validPositions = KingMoves.getMoves(this, board, myPosition);
             default -> throw new RuntimeException("Idk");
         }
         for (ChessPosition position : validPositions) {
