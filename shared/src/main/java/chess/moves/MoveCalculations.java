@@ -45,12 +45,12 @@ public class MoveCalculations {
 
         List<ChessPosition> output = new ArrayList<>();
         if (up) {
-            output.addAll(followLine(maxLength, -1, 1, board, currentPos, color));
             output.addAll(followLine(maxLength, 1, 1, board, currentPos, color));
+            output.addAll(followLine(maxLength, 1, -1, board, currentPos, color));
         }
         if (down) {
+            output.addAll(followLine(maxLength, -1, 1, board, currentPos, color));
             output.addAll(followLine(maxLength, -1, -1, board, currentPos, color));
-            output.addAll(followLine(maxLength, 1, -1, board, currentPos, color));
         }
 
         return output;
@@ -62,16 +62,36 @@ public class MoveCalculations {
 
         List<ChessPosition> output = new ArrayList<>();
         if (up) {
-            output.addAll(followLine(maxLength, 0, 1, board, currentPos, color));
+            output.addAll(followLine(maxLength, 1, 0, board, currentPos, color));
         }
         if (down) {
-            output.addAll(followLine(maxLength, 0, -1, board, currentPos, color));
-        }
-        if (up && down) { //Both means that ALL is the selected move direction
-            output.addAll(followLine(maxLength, 1, 0, board, currentPos, color));
             output.addAll(followLine(maxLength, -1, 0, board, currentPos, color));
         }
+        if (up && down) { //Both means that ALL is the selected move direction
+            output.addAll(followLine(maxLength, 0, 1, board, currentPos, color));
+            output.addAll(followLine(maxLength, 0, -1, board, currentPos, color));
+        }
 
+        return output;
+    }
+
+    public static List<ChessPosition> getLs(int maxLength, MoveDirection direction, ChessBoard board, ChessPosition currentPos, ChessGame.TeamColor color) {
+        List<ChessPosition> output = new ArrayList<>();
+
+        //For simplicity, this is a list of possible displacements a knight can make. Then each one is iterated over.
+        int[][] possibleMoves = {
+                {-1, 2},
+                {-1, -2},
+                {1, 2},
+                {1, -2},
+                {-2, 1},
+                {-2, -1},
+                {2, 1},
+                {2, -1}
+        };
+        for (int[] move : possibleMoves) {
+            output.addAll(followLine(maxLength, move[0], move[1], board, currentPos, color));
+        }
         return output;
     }
 }

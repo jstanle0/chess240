@@ -1,11 +1,10 @@
 package chess;
 
-import chess.moves.BishopMoves;
-import chess.moves.KingMoves;
-import chess.moves.QueenMoves;
-import chess.moves.RookMoves;
+import chess.moves.*;
 
 import java.util.*;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Represents a single chess piece
@@ -58,17 +57,18 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> output = new ArrayList<>();
-        List<ChessPosition> validPositions;
-        PieceType promotionPiece = null;
+        List<ChessPosition> validPositions = emptyList();
         switch (type) {
+            case PAWN -> output = PawnMoves.getMoves(this, board, myPosition); //Pawn returns differently because it can promote
+            case KNIGHT -> validPositions = KnightMoves.getMoves(this, board, myPosition);
             case BISHOP -> validPositions = BishopMoves.getMoves(this, board, myPosition);
             case ROOK -> validPositions = RookMoves.getMoves(this, board, myPosition);
             case QUEEN -> validPositions = QueenMoves.getMoves(this, board, myPosition);
             case KING -> validPositions = KingMoves.getMoves(this, board, myPosition);
-            default -> throw new RuntimeException("Idk");
+            default -> throw new RuntimeException("Invalid Piece");
         }
         for (ChessPosition position : validPositions) {
-            output.add(new ChessMove(myPosition, position, promotionPiece));
+            output.add(new ChessMove(myPosition, position, null));
         }
 
         return output;

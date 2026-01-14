@@ -24,11 +24,8 @@ public class ChessBoard {
     public void addPiece(ChessPosition position, ChessPiece piece) {
         int row = position.getRow() - 1;
         int col = position.getColumn() - 1;
-        if (row > 7 || row < 0 || col > 7 || col < 0) {
+        if (!this.verifyPosition(position)) {
             throw new RuntimeException("Invalid position");
-        }
-        if (this.getPiece(position) != null) {
-            throw new RuntimeException("Piece already at position");
         }
 
         board[row][col] = piece;
