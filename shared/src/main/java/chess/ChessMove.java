@@ -47,7 +47,9 @@ public class ChessMove {
 
     @Override
     public String toString() {
-        return (this.promotion == null) ? this.start.toString() + " -> " + this.end.toString() + "\n" : this.start.toString() + " -> " + this.end.toString() + "(" + this.promotion + ")\n";
+        return (this.promotion == null)
+                ? this.start.toString() + " -> " + this.end.toString() + "\n"
+                : this.start.toString() + " -> " + this.end.toString() + "(" + this.promotion + ")\n";
     }
 
     @Override

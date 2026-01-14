@@ -17,6 +17,7 @@ public class MoveCalculations {
         DOWN,
         ALL
     }
+
     private static List<ChessPosition> followLine(int maxLength, int rowIter, int columnIter, ChessBoard board, ChessPosition currentPos, ChessGame.TeamColor color) {
         List<ChessPosition> output = new ArrayList<>();
         for (int i = 1; i <= maxLength; i++) {

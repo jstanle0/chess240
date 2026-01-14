@@ -11,20 +11,17 @@ public class PawnMoves {
     public static List<ChessMove> getMoves(ChessPiece pawn, ChessBoard board, ChessPosition position) {
         List<ChessMove> output = new ArrayList<>();
         var moveDirection = (pawn.getTeamColor() == ChessGame.TeamColor.WHITE) ? MoveCalculations.MoveDirection.UP : MoveCalculations.MoveDirection.DOWN;
+
         List<ChessPosition> diagonalMoves = MoveCalculations.getDiagonals(1, moveDirection, board, position, pawn.getTeamColor());
         for (ChessPosition move : diagonalMoves) {
             var piece = board.getPiece(move);
             if (piece != null) { // No piece returns means that it isn't taking, therefore it's an invalid pawn move
-                if (move.getRow() == 8 || move.getRow() == 1) { //Pawns can't get into the promotion zone on their own side
-                    for (ChessPiece.PieceType promotion : possiblePromotions) {
-                        output.add(new ChessMove(position, move, promotion));
-                    }
-                } else {
-                    output.add(new ChessMove(position, move, null));
-                }
+                addWithPromotion(output, move, position);
             }
         }
+
         int straightLength = 1;
+        // Check if it's the first move for the pawn. This can be determined from position since pawns don't move backwards.
         if ((pawn.getTeamColor() == ChessGame.TeamColor.WHITE && position.getRow() == 2) || (pawn.getTeamColor() == ChessGame.TeamColor.BLACK && position.getRow() == 7)) {
             straightLength = 2;
         }
@@ -32,16 +29,20 @@ public class PawnMoves {
         for (ChessPosition move : straightMoves) {
             var piece = board.getPiece(move);
             if (piece == null) { // If there's a piece, the pawn is trying to take illegally
-                if (move.getRow() == 8 || move.getRow() == 1) { //Pawns can't get into the promotion zone on their own side
-                    for (ChessPiece.PieceType promotion : possiblePromotions) {
-                        output.add(new ChessMove(position, move, promotion));
-                    }
-                } else {
-                    output.add(new ChessMove(position, move, null));
-                }
+                addWithPromotion(output, move, position);
             }
         }
 
         return output;
+    }
+
+    private static void addWithPromotion(List<ChessMove> out, ChessPosition move, ChessPosition position) {
+        if (move.getRow() == 8 || move.getRow() == 1) { //Pawns can't get into the promotion zone on their own side
+            for (ChessPiece.PieceType promotion : possiblePromotions) {
+                out.add(new ChessMove(position, move, promotion));
+            }
+        } else {
+            out.add(new ChessMove(position, move, null));
+        }
     }
 }
