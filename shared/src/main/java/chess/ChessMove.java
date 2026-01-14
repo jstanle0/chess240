@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -67,5 +69,16 @@ public class ChessMove {
     @Override
     public int hashCode() {
         return Objects.hash(start, end, promotion);
+    }
+
+    /*
+     * Helper function to convert a move to a position. Doesn't support promotion pieces.
+     */
+    public static List<ChessMove> positionsToMoves(List<ChessPosition> positions, ChessPosition currentPosition) {
+        List<ChessMove> output = new ArrayList<>();
+        for (ChessPosition position : positions) {
+            output.add(new ChessMove(currentPosition, position, null));
+        }
+        return output;
     }
 }
