@@ -24,7 +24,7 @@ public class ChessBoard {
     public void addPiece(ChessPosition position, ChessPiece piece) {
         int row = position.getRow() - 1;
         int col = position.getColumn() - 1;
-        if (row > 8 || row < 0 || col > 8 || col < 0) {
+        if (row > 7 || row < 0 || col > 7 || col < 0) {
             throw new RuntimeException("Invalid position");
         }
         if (this.getPiece(position) != null) {
@@ -70,6 +70,15 @@ public class ChessBoard {
             }
         }
         return true;
+    }
+
+    /*
+     * Verifies if a position exists within the bounds of the board.
+     */
+    public boolean verifyPosition(ChessPosition position) {
+        int row = position.getRow() - 1;
+        int col = position.getColumn() - 1;
+        return row <= 7 && row >= 0 && col <= 7 && col >= 0;
     }
 
     @Override

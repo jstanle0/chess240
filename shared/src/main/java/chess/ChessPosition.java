@@ -56,4 +56,11 @@ public class ChessPosition {
         return Objects.hash(row, col);
     }
 
+    public static ChessPosition add(ChessPosition cp1, ChessPosition cp2) {
+        return new ChessPosition(cp1.getRow() + cp2.getRow(), cp1.getColumn() + cp2.getColumn());
+    }
+
+    public ChessPosition add(int rowAdd, int columnAdd) {
+        return new ChessPosition(row + rowAdd, col + columnAdd);
+    }
 }

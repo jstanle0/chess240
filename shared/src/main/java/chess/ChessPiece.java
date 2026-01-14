@@ -1,7 +1,8 @@
 package chess;
 
-import java.util.Collection;
-import java.util.Objects;
+import chess.moves.BishopMoves;
+
+import java.util.*;
 
 /**
  * Represents a single chess piece
@@ -53,7 +54,18 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> output = new ArrayList<>();
+        List<ChessPosition> validPositions;
+        PieceType promotionPiece = null;
+        switch (type) {
+            case BISHOP -> validPositions = BishopMoves.getMoves(this, board, myPosition);
+            default -> throw new RuntimeException("Idk");
+        }
+        for (ChessPosition position : validPositions) {
+            output.add(new ChessMove(myPosition, position, promotionPiece));
+        }
+
+        return output;
     }
 
     @Override
