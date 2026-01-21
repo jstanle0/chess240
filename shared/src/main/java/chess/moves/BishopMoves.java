@@ -7,10 +7,10 @@ import chess.ChessPosition;
 
 import java.util.List;
 
-public class BishopMoves {
+public class BishopMoves extends MoveCalculations {
     public static List<ChessMove> getMoves(ChessPiece bishop, ChessBoard board, ChessPosition position) {
         return ChessMove.positionsToMoves(
-                MoveCalculations.getDiagonals(7, MoveCalculations.MoveDirection.ALL, board, position, bishop.getTeamColor()),
+                getDiagonals(7, MoveDirection.ALL, board, position, bishop.getTeamColor()),
                 position
         );
     }

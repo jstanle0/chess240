@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
- * Helper class that provides the functions for calculating different types of moves.
+ * Super class that provides the functions for calculating different types of moves to child move calculators.
  */
 public class MoveCalculations {
     public enum MoveDirection {

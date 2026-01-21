@@ -7,10 +7,10 @@ import chess.ChessPosition;
 
 import java.util.List;
 
-public class KnightMoves {
+public class KnightMoves extends MoveCalculations {
     public static List<ChessMove> getMoves(ChessPiece bishop, ChessBoard board, ChessPosition position) {
         return ChessMove.positionsToMoves(
-                MoveCalculations.getLs(1, board, position, bishop.getTeamColor()),
+                getLs(1, board, position, bishop.getTeamColor()),
                 position);
     }
 }

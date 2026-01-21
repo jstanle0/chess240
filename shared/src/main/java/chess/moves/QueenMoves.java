@@ -8,11 +8,11 @@ import chess.ChessPosition;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QueenMoves {
+public class QueenMoves extends MoveCalculations {
     public static List<ChessMove> getMoves(ChessPiece king, ChessBoard board, ChessPosition position) {
         List<ChessPosition> output = new ArrayList<>();
-        output.addAll(MoveCalculations.getDiagonals(7, MoveCalculations.MoveDirection.ALL, board, position, king.getTeamColor()));
-        output.addAll(MoveCalculations.getStraight(7, MoveCalculations.MoveDirection.ALL, board, position, king.getTeamColor()));
+        output.addAll(getDiagonals(7, MoveDirection.ALL, board, position, king.getTeamColor()));
+        output.addAll(getStraight(7, MoveDirection.ALL, board, position, king.getTeamColor()));
         return ChessMove.positionsToMoves(output, position);
     }
 }

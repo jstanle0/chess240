@@ -69,7 +69,7 @@ public class ChessBoard {
         return true;
     }
 
-    /*
+    /**
      * Verifies if a position exists within the bounds of the board. Returns false if the position is valid.
      */
     public boolean verifyPosition(ChessPosition position) {

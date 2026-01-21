@@ -71,7 +71,7 @@ public class ChessMove {
         return Objects.hash(start, end, promotion);
     }
 
-    /*
+    /**
      * Helper function to convert a move to a position. Doesn't support promotion pieces.
      */
     public static List<ChessMove> positionsToMoves(List<ChessPosition> positions, ChessPosition currentPosition) {

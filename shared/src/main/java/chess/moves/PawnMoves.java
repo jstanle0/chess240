@@ -5,7 +5,7 @@ import chess.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PawnMoves {
+public class PawnMoves extends MoveCalculations {
     public static ChessPiece.PieceType[] possiblePromotions = {
             ChessPiece.PieceType.QUEEN,
             ChessPiece.PieceType.ROOK,
@@ -16,10 +16,10 @@ public class PawnMoves {
     public static List<ChessMove> getMoves(ChessPiece pawn, ChessBoard board, ChessPosition position) {
         List<ChessMove> output = new ArrayList<>();
         var moveDirection = (pawn.getTeamColor() == ChessGame.TeamColor.WHITE)
-                ? MoveCalculations.MoveDirection.UP
-                : MoveCalculations.MoveDirection.DOWN;
+                ? MoveDirection.UP
+                : MoveDirection.DOWN;
 
-        List<ChessPosition> diagonalMoves = MoveCalculations.getDiagonals(1, moveDirection, board, position, pawn.getTeamColor());
+        List<ChessPosition> diagonalMoves = getDiagonals(1, moveDirection, board, position, pawn.getTeamColor());
         for (ChessPosition move : diagonalMoves) {
             var piece = board.getPiece(move);
             if (piece != null) { // No piece returns means that it isn't taking, therefore it's an invalid pawn move
@@ -32,7 +32,7 @@ public class PawnMoves {
         if (position.getRow() == 2 || position.getRow() == 7) {
             straightLength = 2;
         }
-        List<ChessPosition> straightMoves = MoveCalculations.getStraight(straightLength, moveDirection, board, position, pawn.getTeamColor());
+        List<ChessPosition> straightMoves = getStraight(straightLength, moveDirection, board, position, pawn.getTeamColor());
         for (ChessPosition move : straightMoves) {
             var piece = board.getPiece(move);
             if (piece == null) { // If there's a piece, the pawn is trying to take illegally
