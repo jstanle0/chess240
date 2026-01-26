@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -11,8 +13,10 @@ import java.util.Objects;
 public class ChessBoard {
 
     private ChessPiece[][] board;
+    private Map<ChessGame.TeamColor, ChessPosition> kingPositions;
     public ChessBoard() {
         board = new ChessPiece[8][8];
+        kingPositions = new HashMap<>();
     }
 
     /**
@@ -26,6 +30,9 @@ public class ChessBoard {
         int col = position.getColumn() - 1;
         if (this.verifyPosition(position)) {
             throw new RuntimeException("Invalid position");
+        }
+        if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING) {
+            kingPositions.put(piece.getTeamColor(), position);
         }
 
         board[row][col] = piece;
@@ -48,6 +55,7 @@ public class ChessBoard {
      */
     public void resetBoard() {
         board = BoardStates.defaultState();
+        kingPositions = BoardStates.defaultKingLoc();
     }
 
     @Override
@@ -76,6 +84,10 @@ public class ChessBoard {
         int row = position.getRow() - 1;
         int col = position.getColumn() - 1;
         return row > 7 || row < 0 || col > 7 || col < 0;
+    }
+
+    public ChessPosition getKingPos(ChessGame.TeamColor color) {
+        return kingPositions.get(color);
     }
 
     @Override

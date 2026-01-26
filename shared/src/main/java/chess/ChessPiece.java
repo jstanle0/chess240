@@ -56,7 +56,7 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> output;
         switch (type) {
-            case PAWN -> output = PawnMoves.getMoves(this, board, myPosition); //Pawn returns differently because it can promote
+            case PAWN -> output = PawnMoves.getMoves(this, board, myPosition);
             case KNIGHT -> output = KnightMoves.getMoves(this, board, myPosition);
             case BISHOP -> output = BishopMoves.getMoves(this, board, myPosition);
             case ROOK -> output = RookMoves.getMoves(this, board, myPosition);

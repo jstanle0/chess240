@@ -1,5 +1,8 @@
 package chess;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BoardStates {
     public static ChessPiece[][] defaultState() {
         var board = new ChessPiece[8][8];
@@ -28,5 +31,12 @@ public class BoardStates {
         }
 
         return board;
+    }
+
+    public static Map<ChessGame.TeamColor, ChessPosition> defaultKingLoc() {
+        return new HashMap<>(Map.of(
+                ChessGame.TeamColor.WHITE, new ChessPosition(1, 5),
+                ChessGame.TeamColor.BLACK, new ChessPosition(8, 5)
+        ));
     }
 }
