@@ -73,6 +73,10 @@ public class ChessPiece {
         return output;
     }
 
+    public boolean getSpecial() { return special; }
+
+    public void setSpecial(boolean s) { special = s; }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {

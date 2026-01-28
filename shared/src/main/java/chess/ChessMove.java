@@ -12,15 +12,30 @@ import java.util.Objects;
  */
 public class ChessMove {
 
+    public enum SpecialMoves {
+        ENPASSANT,
+        CASTLE
+    }
+
     private final ChessPosition start;
     private final ChessPosition end;
     private final ChessPiece.PieceType promotion;
+    private final SpecialMoves special;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
         this.start = startPosition;
         this.end = endPosition;
         this.promotion = promotionPiece;
+        this.special = null;
+    }
+
+    public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
+                     ChessPiece.PieceType promotionPiece, SpecialMoves special) {
+        this.start = startPosition;
+        this.end = endPosition;
+        this.promotion = promotionPiece;
+        this.special = special;
     }
 
     /**
@@ -46,6 +61,8 @@ public class ChessMove {
     public ChessPiece.PieceType getPromotionPiece() {
         return promotion;
     }
+
+    public SpecialMoves getSpecial() { return special; }
 
     @Override
     public String toString() {
@@ -80,5 +97,13 @@ public class ChessMove {
             output.add(new ChessMove(currentPosition, position, null));
         }
         return output;
+    }
+
+    /**
+     * Helper function to check if en passant is possible
+     * @return vertical distance a pawn has traveled
+     */
+    public int verticalLength() {
+        return Math.abs(start.getColumn() - end.getColumn());
     }
 }

@@ -24,6 +24,8 @@ public class PawnMoves extends MoveCalculations {
             var piece = board.getPiece(move);
             if (piece != null) { // No piece returns means that it isn't taking, therefore it's an invalid pawn move
                 addWithPromotion(output, move, position);
+            } else if (checkEnPassant(board, position)) {
+                output.add(new ChessMove(position, move, null, ChessMove.SpecialMoves.ENPASSANT));
             }
         }
 
@@ -51,5 +53,19 @@ public class PawnMoves extends MoveCalculations {
         } else {
             out.add(new ChessMove(position, move, null));
         }
+    }
+
+    private static boolean checkEnPassant(ChessBoard board, ChessPosition position) {
+        List<ChessPiece> adjacentPieces = List.of(
+                board.getPiece(position.add(0, 1)) ,
+                board.getPiece(position.add(0, -1))
+        );
+
+        for (ChessPiece piece : adjacentPieces) {
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.getSpecial()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -81,6 +81,7 @@ public class ChessGame {
         board.addPiece(move.getStartPosition(), null);
         ChessPiece takenPiece = board.getPiece(move.getEndPosition()); // The move may be reverted
         board.addPiece(move.getEndPosition(), pieceToAdd);
+        ChessPiece specialPiece = performSpecialHandling(move, board); // To be able to revert a special piece
         if (isInCheck(piece.getTeamColor())) {
             board.addPiece(move.getEndPosition(), takenPiece);
             board.addPiece(move.getStartPosition(), piece);
@@ -89,9 +90,45 @@ public class ChessGame {
         if (revertMove) {
             board.addPiece(move.getEndPosition(), takenPiece);
             board.addPiece(move.getStartPosition(), piece);
+            revertSpecialMove(move, board, specialPiece);
             return;
         }
+        updateSpecialStatus(move, piece, board);
         turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+    }
+
+    private ChessPiece performSpecialHandling(ChessMove move, ChessBoard board) {
+        return switch (move.getSpecial()) {
+            case ENPASSANT -> {
+                ChessPosition enPassantTaken = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
+                ChessPiece takenPiece = board.getPiece(enPassantTaken);
+                board.addPiece(enPassantTaken, null);
+                yield takenPiece;
+            }
+            default -> null;
+        };
+    }
+
+    private void revertSpecialMove(ChessMove move, ChessBoard board, ChessPiece takenPiece) {
+        switch (move.getSpecial()) {
+            case ENPASSANT:
+                ChessPosition enPassantTaken = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
+                board.addPiece(enPassantTaken, takenPiece);
+        }
+    }
+
+    private void updateSpecialStatus(ChessMove move, ChessPiece piece, ChessBoard board) {
+        if (checkCheck(piece.getTeamColor(), board, board.getKingPos(piece.getTeamColor()), true)) {
+            board.getPiece(board.getKingPos(piece.getTeamColor())).setSpecial(false);
+        }
+        switch(piece.getPieceType()) {
+            case KING, ROOK -> piece.setSpecial(false);
+            case PAWN -> {
+                if (move.verticalLength() > 1) {
+                    piece.setSpecial(true);
+                }
+            }
+        }
     }
 
     /**
@@ -104,16 +141,25 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         return checkCheck(teamColor, board, board.getKingPos(teamColor));
     }
-
+    private boolean checkCheck(TeamColor teamColor, ChessBoard board, ChessPosition kingPos) {
+        return checkCheck(teamColor, board, kingPos, false);
+    }
     /**
      * Private function that checks if a chess board has a check state. Can be used to check hypothetical boards to ensure no checks are present.
      */
-    private boolean checkCheck(TeamColor teamColor, ChessBoard board, ChessPosition kingPos) {
+    private boolean checkCheck(TeamColor teamColor, ChessBoard board, ChessPosition kingPos, boolean realMove) {
         for (int r = 1; r < 9; r++) {
             for (int c = 1; c < 9; c++) {
                 ChessPosition pos = new ChessPosition(r, c);
                 ChessPiece piece = board.getPiece(pos);
-                if (piece == null || piece.getTeamColor() == teamColor) {
+                if (piece == null) {
+                    continue;
+                } else if (piece.getTeamColor() == teamColor) {
+                    if (realMove) {
+                        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                            piece.setSpecial(false);
+                        }
+                    }
                     continue;
                 }
                 Collection<ChessMove> moves = piece.pieceMoves(board, pos);
