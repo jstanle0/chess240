@@ -104,6 +104,6 @@ public class ChessMove {
      * @return vertical distance a pawn has traveled
      */
     public int verticalLength() {
-        return Math.abs(start.getColumn() - end.getColumn());
+        return Math.abs(start.getRow() - end.getRow());
     }
 }

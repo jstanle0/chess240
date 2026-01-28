@@ -3,6 +3,7 @@ package chess.moves;
 import chess.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PawnMoves extends MoveCalculations {
@@ -24,7 +25,7 @@ public class PawnMoves extends MoveCalculations {
             var piece = board.getPiece(move);
             if (piece != null) { // No piece returns means that it isn't taking, therefore it's an invalid pawn move
                 addWithPromotion(output, move, position);
-            } else if (checkEnPassant(board, position)) {
+            } else if (checkEnPassant(board, position, move)) {
                 output.add(new ChessMove(position, move, null, ChessMove.SpecialMoves.ENPASSANT));
             }
         }
@@ -55,17 +56,9 @@ public class PawnMoves extends MoveCalculations {
         }
     }
 
-    private static boolean checkEnPassant(ChessBoard board, ChessPosition position) {
-        List<ChessPiece> adjacentPieces = List.of(
-                board.getPiece(position.add(0, 1)) ,
-                board.getPiece(position.add(0, -1))
-        );
-
-        for (ChessPiece piece : adjacentPieces) {
-            if (piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.getSpecial()) {
-                return true;
-            }
-        }
-        return false;
+    private static boolean checkEnPassant(ChessBoard board, ChessPosition move, ChessPosition position) {
+        ChessPosition enPassantPos = new ChessPosition(position.getRow(), move.getColumn());
+        ChessPiece piece = board.getPiece(enPassantPos);
+        return piece != null && piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.getSpecial();
     }
 }

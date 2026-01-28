@@ -105,7 +105,7 @@ public class ChessGame {
                 board.addPiece(enPassantTaken, null);
                 yield takenPiece;
             }
-            default -> null;
+            case null, default -> null;
         };
     }
 
@@ -114,6 +114,9 @@ public class ChessGame {
             case ENPASSANT:
                 ChessPosition enPassantTaken = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
                 board.addPiece(enPassantTaken, takenPiece);
+            case null:
+            case CASTLE:
+                break;
         }
     }
 
