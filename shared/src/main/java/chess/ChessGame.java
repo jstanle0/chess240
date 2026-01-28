@@ -54,7 +54,7 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
-        moves.removeIf(move -> checkHypotheticalCheck(piece.getTeamColor(), board, move));
+        moves.removeIf(move -> checkHypotheticalCheck(board, move));
         return moves;
     }
 
@@ -173,7 +173,7 @@ public class ChessGame {
         return false;
     }
 
-    private boolean checkHypotheticalCheck(TeamColor color, ChessBoard board, ChessMove move) {
+    private boolean checkHypotheticalCheck(ChessBoard board, ChessMove move) {
         try {
             makeMoveOnBoard(move, board, true); // If this error, the move is invalid
             return false;
@@ -185,11 +185,10 @@ public class ChessGame {
     /**
      * Function that checks the surrounding squares to a given king position to see if the king has available moves
      */
-    private boolean checkSurroundings(TeamColor color, ChessBoard board, ChessPosition kingPos) {
+    private boolean checkSurroundings(ChessBoard board, ChessPosition kingPos) {
         ChessPiece king = board.getPiece(kingPos);
         Collection<ChessMove> possibleMoves = king.pieceMoves(board, kingPos);
-        //board.addPiece(kingPos, null); //Remove the king. Since the king can't block itself, this ensures all squares checked actually aren't threatened
-        possibleMoves.removeIf(move -> checkHypotheticalCheck(color, board, move));
+        possibleMoves.removeIf(move -> checkHypotheticalCheck(board, move));
         board.addPiece(kingPos, king);
         return possibleMoves.isEmpty();
     }
@@ -207,7 +206,7 @@ public class ChessGame {
                     return true;
                 } else if (kingChecked) {
                     for (ChessMove move : moves) {
-                        if (!checkHypotheticalCheck(color, board, move)) {
+                        if (!checkHypotheticalCheck(board, move)) {
                             return true;
                         }
                     }
@@ -225,7 +224,7 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         return checkCheck(teamColor, board, board.getKingPos(teamColor))
-                && checkSurroundings(teamColor, board, board.getKingPos(teamColor))
+                && checkSurroundings(board, board.getKingPos(teamColor))
                 && !teamHasMoves(teamColor, board, true);
     }
 
@@ -237,7 +236,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return !checkCheck(teamColor, board, board.getKingPos(teamColor)) && checkSurroundings(teamColor, board, board.getKingPos(teamColor)) && !teamHasMoves(teamColor, board, false);
+        return !checkCheck(teamColor, board, board.getKingPos(teamColor)) && checkSurroundings(board, board.getKingPos(teamColor)) && !teamHasMoves(teamColor, board, false);
     }
 
     /**
