@@ -25,7 +25,7 @@ public class PawnMoves extends MoveCalculations {
             var piece = board.getPiece(move);
             if (piece != null) { // No piece returns means that it isn't taking, therefore it's an invalid pawn move
                 addWithPromotion(output, move, position);
-            } else if (checkEnPassant(board, position, move)) {
+            } else if (checkEnPassant(board, move, position)) {
                 output.add(new ChessMove(position, move, null, ChessMove.SpecialMoves.ENPASSANT));
             }
         }

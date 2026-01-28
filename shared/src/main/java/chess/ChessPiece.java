@@ -82,7 +82,7 @@ public class ChessPiece {
         if (obj == this) {
             return true;
         }
-        if (obj.getClass() != ChessPiece.class) {
+        if (obj == null || obj.getClass() != ChessPiece.class) {
             return false;
         }
         ChessPiece cp = (ChessPiece) obj;
