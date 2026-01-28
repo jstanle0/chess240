@@ -3,7 +3,6 @@ package chess.moves;
 import chess.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class PawnMoves extends MoveCalculations {

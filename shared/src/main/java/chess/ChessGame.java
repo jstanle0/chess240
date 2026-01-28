@@ -193,7 +193,7 @@ public class ChessGame {
         return possibleMoves.isEmpty();
     }
 
-    private boolean teamHasMoves(TeamColor color, ChessBoard board, boolean kingChecked) {
+    private boolean teamOutOfMoves(TeamColor color, ChessBoard board, boolean kingChecked) {
         for (int r = 1; r < 9; r++) {
             for (int c = 1; c < 9; c++) {
                 ChessPosition pos = new ChessPosition(r, c);
@@ -203,17 +203,17 @@ public class ChessGame {
                 }
                 Collection<ChessMove> moves = piece.pieceMoves(board, pos);
                 if (!kingChecked && !moves.isEmpty()) {
-                    return true;
+                    return false;
                 } else if (kingChecked) {
                     for (ChessMove move : moves) {
                         if (!checkHypotheticalCheck(board, move)) {
-                            return true;
+                            return false;
                         }
                     }
                 }
             }
         }
-        return false;
+        return true;
     }
 
     /**
@@ -225,7 +225,7 @@ public class ChessGame {
     public boolean isInCheckmate(TeamColor teamColor) {
         return checkCheck(teamColor, board, board.getKingPos(teamColor))
                 && checkSurroundings(board, board.getKingPos(teamColor))
-                && !teamHasMoves(teamColor, board, true);
+                && teamOutOfMoves(teamColor, board, true);
     }
 
     /**
@@ -236,7 +236,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return !checkCheck(teamColor, board, board.getKingPos(teamColor)) && checkSurroundings(board, board.getKingPos(teamColor)) && !teamHasMoves(teamColor, board, false);
+        return !checkCheck(teamColor, board, board.getKingPos(teamColor)) && checkSurroundings(board, board.getKingPos(teamColor)) && teamOutOfMoves(teamColor, board, false);
     }
 
     /**
