@@ -81,7 +81,7 @@ public class ChessGame {
         board.addPiece(move.getStartPosition(), null);
         ChessPiece takenPiece = board.getPiece(move.getEndPosition()); // The move may be reverted
         board.addPiece(move.getEndPosition(), pieceToAdd);
-        ChessPiece specialPiece = performSpecialHandling(move, board); // To be able to revert a special piece
+        ChessPiece specialPiece = performSpecialHandling(move, board, piece, takenPiece); // To be able to revert a special piece
         if (isInCheck(piece.getTeamColor())) {
             board.addPiece(move.getEndPosition(), takenPiece);
             board.addPiece(move.getStartPosition(), piece);
@@ -97,26 +97,23 @@ public class ChessGame {
         turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
-    private ChessPiece performSpecialHandling(ChessMove move, ChessBoard board) {
-        return switch (move.getSpecial()) {
-            case ENPASSANT -> {
-                ChessPosition enPassantTaken = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
-                ChessPiece takenPiece = board.getPiece(enPassantTaken);
-                board.addPiece(enPassantTaken, null);
-                yield takenPiece;
-            }
-            case null, default -> null;
-        };
+    private ChessPiece performSpecialHandling(ChessMove move, ChessBoard board, ChessPiece piece, ChessPiece takenPiece) {
+        if (checkIfEnPassant(piece, takenPiece)) {
+            ChessPosition enPassantTaken = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
+            ChessPiece specialPiece = board.getPiece(enPassantTaken);
+            board.addPiece(enPassantTaken, null);
+            return specialPiece;
+        }
+        return null;
+    }
+    private boolean checkIfEnPassant(ChessPiece piece, ChessPiece takenPiece) {
+        return piece != null && piece.getPieceType() == ChessPiece.PieceType.PAWN && takenPiece == null;
     }
 
     private void revertSpecialMove(ChessMove move, ChessBoard board, ChessPiece takenPiece) {
-        switch (move.getSpecial()) {
-            case ENPASSANT:
-                ChessPosition enPassantTaken = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
-                board.addPiece(enPassantTaken, takenPiece);
-            case null:
-            case CASTLE:
-                break;
+        if (takenPiece != null) {
+            ChessPosition enPassantTaken = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
+            board.addPiece(enPassantTaken, takenPiece);
         }
     }
 
