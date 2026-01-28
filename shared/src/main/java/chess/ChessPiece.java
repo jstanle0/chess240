@@ -14,10 +14,15 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor color;
     private final ChessPiece.PieceType type;
+    private boolean special; // This is a boolean trigger for special moves. It behaves differently for different piece types.
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.color = pieceColor;
         this.type = type;
+        this.special = switch (type) {
+            case ROOK, KING -> true; // Check if a piece has moved for castling
+            default -> false;  // Stores if a pawn has a possibility to be en passant'd
+        };
     }
 
     /**
