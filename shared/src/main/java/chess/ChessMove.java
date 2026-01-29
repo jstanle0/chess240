@@ -89,4 +89,8 @@ public class ChessMove {
     public int verticalLength() {
         return Math.abs(start.getRow() - end.getRow());
     }
+
+    public int horizontalLength() {
+        return Math.abs(start.getColumn() - end.getColumn());
+    }
 }

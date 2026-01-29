@@ -1,5 +1,7 @@
 package chess;
 
+import chess.moves.KingMoves;
+
 import java.util.Collection;
 import java.util.Objects;
 
@@ -104,16 +106,40 @@ public class ChessGame {
             board.addPiece(enPassantTaken, null);
             return specialPiece;
         }
+        if (checkIfCastle(piece, move)) {
+            boolean positiveDirection = move.getEndPosition().getColumn() > move.getStartPosition().getColumn();
+            ChessPosition rookPos = KingMoves.getDefaultRookFromKing(
+                    move.getStartPosition(),
+                    positiveDirection
+            );
+            ChessPiece rook = board.getPiece(rookPos);
+            board.addPiece(rookPos, null);
+            board.addPiece(move.getEndPosition().add(0, positiveDirection ? 1 : -1), rook);
+        }
         return null;
     }
     private boolean checkIfEnPassant(ChessPiece piece, ChessPiece takenPiece) {
         return piece != null && piece.getPieceType() == ChessPiece.PieceType.PAWN && takenPiece == null;
     }
 
+    private boolean checkIfCastle(ChessPiece piece, ChessMove move) {
+        return piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && move.horizontalLength() > 1;
+    }
+
     private void revertSpecialMove(ChessMove move, ChessBoard board, ChessPiece takenPiece) {
         if (takenPiece != null) {
-            ChessPosition enPassantTaken = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
-            board.addPiece(enPassantTaken, takenPiece);
+            if (takenPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                ChessPosition enPassantTaken = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
+                board.addPiece(enPassantTaken, takenPiece);
+            } else if (takenPiece.getPieceType() == ChessPiece.PieceType.ROOK) {
+                boolean positiveDirection = move.getEndPosition().getColumn() > move.getStartPosition().getColumn();
+                ChessPosition rookPos = KingMoves.getDefaultRookFromKing(
+                        move.getStartPosition(),
+                        positiveDirection
+                );
+                board.addPiece(rookPos, takenPiece);
+                board.addPiece(move.getEndPosition().add(0, positiveDirection ? 1 : -1), null);
+            }
         }
     }
 
