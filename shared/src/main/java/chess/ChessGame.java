@@ -107,6 +107,7 @@ public class ChessGame {
             return specialPiece;
         }
         if (checkIfCastle(piece, move)) {
+            //System.out.println(board.toString() + "\n");
             boolean positiveDirection = move.getEndPosition().getColumn() > move.getStartPosition().getColumn();
             ChessPosition rookPos = KingMoves.getDefaultRookFromKing(
                     move.getStartPosition(),
@@ -114,7 +115,9 @@ public class ChessGame {
             );
             ChessPiece rook = board.getPiece(rookPos);
             board.addPiece(rookPos, null);
-            board.addPiece(move.getEndPosition().add(0, positiveDirection ? 1 : -1), rook);
+            board.addPiece(move.getEndPosition().add(0, positiveDirection ? -1 : 1), rook);
+            //System.out.println(board.toString() + "\n");
+            return rook;
         }
         return null;
     }
@@ -138,7 +141,7 @@ public class ChessGame {
                         positiveDirection
                 );
                 board.addPiece(rookPos, takenPiece);
-                board.addPiece(move.getEndPosition().add(0, positiveDirection ? 1 : -1), null);
+                board.addPiece(move.getEndPosition().add(0, positiveDirection ? -1 : 1), null);
             }
         }
     }
