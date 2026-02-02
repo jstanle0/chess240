@@ -5,7 +5,7 @@ import chess.*;
 import java.util.*;
 
 public class KingMoves extends MoveCalculations {
-    static final Map<ChessGame.TeamColor, Collection<ChessPosition>> rookPos = Map.of(
+    static final Map<ChessGame.TeamColor, Collection<ChessPosition>> ROOK_POS = Map.of(
             ChessGame.TeamColor.WHITE, List.of(new ChessPosition(1, 1), new ChessPosition(1, 8)),
             ChessGame.TeamColor.BLACK, List.of(new ChessPosition(8, 1), new ChessPosition(8, 8))
     );
@@ -26,7 +26,7 @@ public class KingMoves extends MoveCalculations {
 
     private static List<ChessPosition> getCastle(ChessPiece king, ChessBoard board, ChessPosition position) {
         List<ChessPosition> out = new ArrayList<>();
-        for (ChessPosition pos : rookPos.get(king.getTeamColor())) {
+        for (ChessPosition pos : ROOK_POS.get(king.getTeamColor())) {
             ChessPiece rook = board.getPiece(pos);
             if (rook != null && rook.getPieceType() == ChessPiece.PieceType.ROOK && rook.getSpecial()) {
                 if (pos.getColumn() > position.getColumn()) {

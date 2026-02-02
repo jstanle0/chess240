@@ -59,10 +59,8 @@ public abstract class GameHelpers {
                 if (piece == null) {
                     continue;
                 } else if (piece.getTeamColor() == teamColor) {
-                    if (realMove) {
-                        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
-                            piece.setSpecial(false);
-                        }
+                    if (realMove && piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                        piece.setSpecial(false);
                     }
                     continue;
                 }
@@ -114,7 +112,10 @@ public abstract class GameHelpers {
      */
     protected ChessPiece performSpecialHandling(ChessMove move, ChessBoard board, ChessPiece piece, ChessPiece takenPiece) throws InvalidMoveException {
         if (checkIfEnPassant(piece, takenPiece)) {
-            ChessPosition enPassantTaken = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
+            ChessPosition enPassantTaken = new ChessPosition(
+                    move.getStartPosition().getRow(),
+                    move.getEndPosition().getColumn()
+            );
             ChessPiece specialPiece = board.getPiece(enPassantTaken);
             board.addPiece(enPassantTaken, null);
             return specialPiece;
@@ -220,11 +221,12 @@ public abstract class GameHelpers {
                 Collection<ChessMove> moves = piece.pieceMoves(board, pos);
                 if (!kingChecked && !moves.isEmpty()) {
                     return false;
-                } else if (kingChecked) {
-                    for (ChessMove move : moves) {
-                        if (!checkHypotheticalCheck(board, move)) {
-                            return false;
-                        }
+                } else if (!kingChecked) {
+                    continue;
+                }
+                for (ChessMove move : moves) {
+                    if (!checkHypotheticalCheck(board, move)) {
+                        return false;
                     }
                 }
             }

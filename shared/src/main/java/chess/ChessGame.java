@@ -103,7 +103,9 @@ public class ChessGame extends GameHelpers {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return !checkCheck(teamColor, board, board.getKingPos(teamColor)) && checkSurroundings(board, board.getKingPos(teamColor)) && teamOutOfMoves(teamColor, board, false);
+        return !checkCheck(teamColor, board, board.getKingPos(teamColor)) &&
+                checkSurroundings(board, board.getKingPos(teamColor)) &&
+                teamOutOfMoves(teamColor, board, false);
     }
 
     /**
