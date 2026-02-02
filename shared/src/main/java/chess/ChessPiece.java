@@ -21,7 +21,7 @@ public class ChessPiece {
         this.type = type;
         this.special = switch (type) {
             case ROOK, KING -> true; // Check if a piece has moved for castling
-            default -> false;  // Stores if a pawn has a possibility to be en passant'd
+            default -> false;  // Stores if a pawn has a possibility to be taken via en passant
         };
     }
 
@@ -86,7 +86,7 @@ public class ChessPiece {
             return false;
         }
         ChessPiece cp = (ChessPiece) obj;
-        return cp.color == this.color && cp.type == this.type;
+        return cp.color == this.color && cp.type == this.type; //Ignores special because the tests don't support it
     }
 
     @Override

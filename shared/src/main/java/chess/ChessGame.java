@@ -1,7 +1,5 @@
 package chess;
 
-import chess.moves.KingMoves;
-
 import java.util.Collection;
 import java.util.Objects;
 
@@ -11,10 +9,7 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessGame {
-
-    private TeamColor turn;
-    private ChessBoard board;
+public class ChessGame extends GameHelpers {
 
     public ChessGame() {
         turn = TeamColor.WHITE;
@@ -58,9 +53,7 @@ public class ChessGame {
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
         moves.removeIf(move ->
                 checkHypotheticalCheck(board, move) ||
-                        (piece.getPieceType() == ChessPiece.PieceType.KING &&
-                                move.horizontalLength() > 1 &&
-                                (!piece.getSpecial() || checkCheck(piece.getTeamColor(), board, move.getStartPosition())))
+                        (checkIfCastle(piece, move) && checkCheck(piece.getTeamColor(), board, move.getStartPosition()))
         );
         return moves;
     }
@@ -79,106 +72,6 @@ public class ChessGame {
         makeMoveOnBoard(move, board, false);
     }
 
-    private void makeMoveOnBoard(ChessMove move, ChessBoard board, boolean revertMove) throws InvalidMoveException {
-        ChessPiece piece = board.getPiece(move.getStartPosition());
-        ChessPiece pieceToAdd = (move.getPromotionPiece() == null) ? piece : new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
-        if (!piece.pieceMoves(board, move.getStartPosition()).contains(move)) {
-            throw new InvalidMoveException();
-        }
-        board.addPiece(move.getStartPosition(), null);
-        ChessPiece takenPiece = board.getPiece(move.getEndPosition()); // The move may be reverted
-        board.addPiece(move.getEndPosition(), pieceToAdd);
-        ChessPiece specialPiece = performSpecialHandling(move, board, piece, takenPiece); // To be able to revert a special piece
-        if (isInCheck(piece.getTeamColor())) {
-            board.addPiece(move.getEndPosition(), takenPiece);
-            board.addPiece(move.getStartPosition(), piece);
-            throw new InvalidMoveException();
-        }
-        if (revertMove) {
-            board.addPiece(move.getEndPosition(), takenPiece);
-            board.addPiece(move.getStartPosition(), piece);
-            revertSpecialMove(move, board, specialPiece);
-            return;
-        }
-        updateSpecialStatus(move, piece, board);
-        turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-    }
-
-    private ChessPiece performSpecialHandling(ChessMove move, ChessBoard board, ChessPiece piece, ChessPiece takenPiece) throws InvalidMoveException {
-        if (checkIfEnPassant(piece, takenPiece)) {
-            ChessPosition enPassantTaken = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
-            ChessPiece specialPiece = board.getPiece(enPassantTaken);
-            board.addPiece(enPassantTaken, null);
-            return specialPiece;
-        }
-        if (checkIfCastle(piece, move)) {
-            if (checkInvalidCastle(board, move, piece)) {
-                board.addPiece(move.getEndPosition(), takenPiece);
-                board.addPiece(move.getStartPosition(), piece);
-                throw new InvalidMoveException();
-            }
-            boolean positiveDirection = move.getEndPosition().getColumn() > move.getStartPosition().getColumn();
-            ChessPosition rookPos = KingMoves.getDefaultRookFromKing(
-                    move.getStartPosition(),
-                    positiveDirection
-            );
-            ChessPiece rook = board.getPiece(rookPos);
-            board.addPiece(rookPos, null);
-            board.addPiece(move.getEndPosition().add(0, positiveDirection ? -1 : 1), rook);
-            //System.out.println(board.toString() + "\n");
-            return rook;
-        }
-        return null;
-    }
-    private boolean checkIfEnPassant(ChessPiece piece, ChessPiece takenPiece) {
-        return piece != null && piece.getPieceType() == ChessPiece.PieceType.PAWN && takenPiece == null;
-    }
-
-    private boolean checkIfCastle(ChessPiece piece, ChessMove move) {
-        return piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && move.horizontalLength() > 1;
-    }
-
-    private boolean checkInvalidCastle(ChessBoard board, ChessMove move, ChessPiece king) {
-        ChessMove middleMove = new ChessMove(
-                move.getEndPosition(),
-                move.getEndPosition().add(0, move.getEndPosition().getColumn() > move.getStartPosition().getColumn() ? -1 : 1),
-                null
-        );
-        return isInCheck(king.getTeamColor()) || checkHypotheticalCheck(board, middleMove);
-    }
-
-    private void revertSpecialMove(ChessMove move, ChessBoard board, ChessPiece takenPiece) {
-        if (takenPiece != null) {
-            if (takenPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
-                ChessPosition enPassantTaken = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
-                board.addPiece(enPassantTaken, takenPiece);
-            } else if (takenPiece.getPieceType() == ChessPiece.PieceType.ROOK) {
-                boolean positiveDirection = move.getEndPosition().getColumn() > move.getStartPosition().getColumn();
-                ChessPosition rookPos = KingMoves.getDefaultRookFromKing(
-                        move.getStartPosition(),
-                        positiveDirection
-                );
-                board.addPiece(rookPos, takenPiece);
-                board.addPiece(move.getEndPosition().add(0, positiveDirection ? -1 : 1), null);
-                //System.out.println(board.toString() + "\n");
-            }
-        }
-    }
-
-    private void updateSpecialStatus(ChessMove move, ChessPiece piece, ChessBoard board) {
-        if (checkCheck(piece.getTeamColor(), board, board.getKingPos(piece.getTeamColor()), true)) {
-            board.getPiece(board.getKingPos(piece.getTeamColor())).setSpecial(false);
-        }
-        switch(piece.getPieceType()) {
-            case KING, ROOK -> piece.setSpecial(false);
-            case PAWN -> {
-                if (move.verticalLength() > 1) {
-                    piece.setSpecial(true);
-                }
-            }
-        }
-    }
-
     /**
      * Determines if the given team is in check
      * Since check can be made by a discovered attack, all pieces must be evaluated for a check.
@@ -188,80 +81,6 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         return checkCheck(teamColor, board, board.getKingPos(teamColor));
-    }
-    private boolean checkCheck(TeamColor teamColor, ChessBoard board, ChessPosition kingPos) {
-        return checkCheck(teamColor, board, kingPos, false);
-    }
-    /**
-     * Private function that checks if a chess board has a check state. Can be used to check hypothetical boards to ensure no checks are present.
-     */
-    private boolean checkCheck(TeamColor teamColor, ChessBoard board, ChessPosition kingPos, boolean realMove) {
-        for (int r = 1; r < 9; r++) {
-            for (int c = 1; c < 9; c++) {
-                ChessPosition pos = new ChessPosition(r, c);
-                ChessPiece piece = board.getPiece(pos);
-                if (piece == null) {
-                    continue;
-                } else if (piece.getTeamColor() == teamColor) {
-                    if (realMove) {
-                        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
-                            piece.setSpecial(false);
-                        }
-                    }
-                    continue;
-                }
-                Collection<ChessMove> moves = piece.pieceMoves(board, pos);
-                for (ChessMove move : moves) {
-                    if (move.getEndPosition().equals(kingPos)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean checkHypotheticalCheck(ChessBoard board, ChessMove move) {
-        try {
-            makeMoveOnBoard(move, board, true); // If this error, the move is invalid
-            return false;
-        } catch (InvalidMoveException e) {
-            return true;
-        }
-    }
-
-    /**
-     * Function that checks the surrounding squares to a given king position to see if the king has available moves
-     */
-    private boolean checkSurroundings(ChessBoard board, ChessPosition kingPos) {
-        ChessPiece king = board.getPiece(kingPos);
-        Collection<ChessMove> possibleMoves = king.pieceMoves(board, kingPos);
-        possibleMoves.removeIf(move -> checkHypotheticalCheck(board, move));
-        board.addPiece(kingPos, king);
-        return possibleMoves.isEmpty();
-    }
-
-    private boolean teamOutOfMoves(TeamColor color, ChessBoard board, boolean kingChecked) {
-        for (int r = 1; r < 9; r++) {
-            for (int c = 1; c < 9; c++) {
-                ChessPosition pos = new ChessPosition(r, c);
-                ChessPiece piece = board.getPiece(pos);
-                if (piece == null || piece.getTeamColor() != color || piece.getPieceType() == ChessPiece.PieceType.KING) {
-                    continue;
-                }
-                Collection<ChessMove> moves = piece.pieceMoves(board, pos);
-                if (!kingChecked && !moves.isEmpty()) {
-                    return false;
-                } else if (kingChecked) {
-                    for (ChessMove move : moves) {
-                        if (!checkHypotheticalCheck(board, move)) {
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-        return true;
     }
 
     /**
