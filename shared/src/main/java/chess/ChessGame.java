@@ -56,7 +56,12 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
-        moves.removeIf(move -> checkHypotheticalCheck(board, move));
+        moves.removeIf(move ->
+                checkHypotheticalCheck(board, move) ||
+                        (piece.getPieceType() == ChessPiece.PieceType.KING &&
+                                move.horizontalLength() > 1 &&
+                                (!piece.getSpecial() || checkCheck(piece.getTeamColor(), board, move.getStartPosition())))
+        );
         return moves;
     }
 
@@ -99,7 +104,7 @@ public class ChessGame {
         turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
-    private ChessPiece performSpecialHandling(ChessMove move, ChessBoard board, ChessPiece piece, ChessPiece takenPiece) {
+    private ChessPiece performSpecialHandling(ChessMove move, ChessBoard board, ChessPiece piece, ChessPiece takenPiece) throws InvalidMoveException {
         if (checkIfEnPassant(piece, takenPiece)) {
             ChessPosition enPassantTaken = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
             ChessPiece specialPiece = board.getPiece(enPassantTaken);
@@ -107,7 +112,11 @@ public class ChessGame {
             return specialPiece;
         }
         if (checkIfCastle(piece, move)) {
-            //System.out.println(board.toString() + "\n");
+            if (checkInvalidCastle(board, move, piece)) {
+                board.addPiece(move.getEndPosition(), takenPiece);
+                board.addPiece(move.getStartPosition(), piece);
+                throw new InvalidMoveException();
+            }
             boolean positiveDirection = move.getEndPosition().getColumn() > move.getStartPosition().getColumn();
             ChessPosition rookPos = KingMoves.getDefaultRookFromKing(
                     move.getStartPosition(),
@@ -129,6 +138,15 @@ public class ChessGame {
         return piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && move.horizontalLength() > 1;
     }
 
+    private boolean checkInvalidCastle(ChessBoard board, ChessMove move, ChessPiece king) {
+        ChessMove middleMove = new ChessMove(
+                move.getEndPosition(),
+                move.getEndPosition().add(0, move.getEndPosition().getColumn() > move.getStartPosition().getColumn() ? -1 : 1),
+                null
+        );
+        return isInCheck(king.getTeamColor()) || checkHypotheticalCheck(board, middleMove);
+    }
+
     private void revertSpecialMove(ChessMove move, ChessBoard board, ChessPiece takenPiece) {
         if (takenPiece != null) {
             if (takenPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
@@ -142,6 +160,7 @@ public class ChessGame {
                 );
                 board.addPiece(rookPos, takenPiece);
                 board.addPiece(move.getEndPosition().add(0, positiveDirection ? -1 : 1), null);
+                //System.out.println(board.toString() + "\n");
             }
         }
     }
