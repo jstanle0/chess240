@@ -110,12 +110,14 @@ public abstract class GameHelpers {
      * @return ChessPiece representing the piece affected by the special move (rook in castle/other pawn in en passant)
      * @throws InvalidMoveException If an invalid castle is attempted
      */
-    protected ChessPiece performSpecialHandling(ChessMove move, ChessBoard board, ChessPiece piece, ChessPiece takenPiece) throws InvalidMoveException {
+    protected ChessPiece performSpecialHandling(
+            ChessMove move,
+            ChessBoard board,
+            ChessPiece piece,
+            ChessPiece takenPiece
+    ) throws InvalidMoveException {
         if (checkIfEnPassant(piece, takenPiece)) {
-            ChessPosition enPassantTaken = new ChessPosition(
-                    move.getStartPosition().getRow(),
-                    move.getEndPosition().getColumn()
-            );
+            ChessPosition enPassantTaken = new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn());
             ChessPiece specialPiece = board.getPiece(enPassantTaken);
             board.addPiece(enPassantTaken, null);
             return specialPiece;
