@@ -17,8 +17,6 @@ public class LoginHandler implements Handler {
             body = new Gson().fromJson(json, UserData.class);
 
         } catch (Exception e) {
-//
-//            return;
             throw new BadRequestResponse();
         }
 

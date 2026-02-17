@@ -1,9 +1,10 @@
 package server;
 
-import dataaccess.DataAccessException;
 import io.javalin.*;
 import handler.LoginHandler;
 import io.javalin.http.BadRequestResponse;
+import io.javalin.http.ForbiddenResponse;
+import io.javalin.http.UnauthorizedResponse;
 
 public class Server {
 
@@ -14,6 +15,7 @@ public class Server {
 
         // Register your endpoints and exception handlers here.
         createHandlers(javalin);
+        createExceptionHandlers(javalin);
     }
 
     public int run(int desiredPort) {
@@ -30,11 +32,28 @@ public class Server {
             ctx.result("healthy :)");
         });
         javalin.post("/user", new LoginHandler());
+    }
 
+    private void createExceptionHandlers(Javalin javalin) {
         javalin.exception(BadRequestResponse.class, (e, ctx) -> {
             System.out.println("***Bad request exception: " + e.getMessage());
             ctx.status(400);
-            ctx.json("{\"message\":\"Invalid body\"}");
+            ctx.json("{\"message\":\"bad request\"}");
+        });
+        javalin.exception(ForbiddenResponse.class, (e, ctx) -> {
+            System.out.println("***Forbidden Action Exception: " + e.getMessage());
+            ctx.status(403);
+            ctx.json("{\"message\":\"already taken\"}");
+        });
+        javalin.exception(UnauthorizedResponse.class, (e, ctx) -> {
+            System.out.println("***Unauthorized Exception: " + e.getMessage());
+            ctx.status(401);
+            ctx.json("{\"message\":\"unauthorized\"}");
+        });
+        javalin.exception(Exception.class, (e, ctx) -> {
+            System.out.println("***Exception: " + e.getMessage());
+            ctx.status(500);
+            ctx.json("{\"message\":\"internal server error: " + e.getMessage() + "\"}");
         });
     }
 }
