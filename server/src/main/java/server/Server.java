@@ -4,6 +4,7 @@ import io.javalin.*;
 import handler.LoginHandler;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ForbiddenResponse;
+import io.javalin.http.NotFoundResponse;
 import io.javalin.http.UnauthorizedResponse;
 
 public class Server {
@@ -28,9 +29,7 @@ public class Server {
     }
 
     private void createHandlers(Javalin javalin) {
-        javalin.get("/health", ctx -> {
-            ctx.result("healthy :)");
-        });
+        javalin.get("/health", ctx -> ctx.result("healthy :)"));
         javalin.post("/user", new LoginHandler());
     }
 
@@ -49,6 +48,11 @@ public class Server {
             System.out.println("***Unauthorized Exception: " + e.getMessage());
             ctx.status(401);
             ctx.json("{\"message\":\"unauthorized\"}");
+        });
+        javalin.exception(NotFoundResponse.class, (e, ctx) -> {
+            System.out.println("***Not Found Exception: " + e.getMessage());
+            ctx.status(404);
+            ctx.json("{\"message\":\"not found\"}");
         });
         javalin.exception(Exception.class, (e, ctx) -> {
             System.out.println("***Exception: " + e.getMessage());
