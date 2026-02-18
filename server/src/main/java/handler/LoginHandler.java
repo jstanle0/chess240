@@ -6,6 +6,7 @@ import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.ForbiddenResponse;
 import io.javalin.http.Handler;
+import models.AuthData;
 import models.UserData;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,12 +22,8 @@ public class LoginHandler implements Handler {
             throw new BadRequestResponse(e.getMessage());
         }
 
-        try {
-            register(body);
-        } catch (DataAccessException e) {
-            throw new ForbiddenResponse(e.getMessage());
-        }
+        AuthData authData = register(body);
 
-        ctx.json("{\"hello\": \"world\"}");
+        ctx.json(new Gson().toJson(authData));
     }
 }
