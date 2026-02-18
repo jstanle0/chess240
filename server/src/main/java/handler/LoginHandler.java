@@ -1,29 +1,25 @@
 package handler;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import io.javalin.http.BadRequestResponse;
-import io.javalin.http.Context;
-import io.javalin.http.ForbiddenResponse;
-import io.javalin.http.Handler;
+import io.javalin.http.*;
 import models.AuthData;
-import models.UserData;
+import models.LoginUserData;
 import org.jetbrains.annotations.NotNull;
 
-import static service.LoginService.register;
+import static service.LoginService.login;
 
 public class LoginHandler implements Handler {
     @Override
-    public void handle(@NotNull Context ctx) {
-        UserData body;
+    public void handle(@NotNull Context context) throws ForbiddenResponse, NotFoundResponse, BadRequestResponse {
+        Gson gson = new Gson();
+        LoginUserData data;
         try {
-            body = new Gson().fromJson(ctx.body(), UserData.class);
+            data = gson.fromJson(context.body(), LoginUserData.class);
         } catch (Exception e) {
-            throw new BadRequestResponse(e.getMessage());
+            throw new BadRequestResponse("failed to parse body: " + e.getMessage());
         }
 
-        AuthData authData = register(body);
-
-        ctx.json(new Gson().toJson(authData));
+        AuthData authData = login(data);
+        context.json(gson.toJson(authData));
     }
 }

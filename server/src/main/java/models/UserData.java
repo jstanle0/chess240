@@ -5,3 +5,4 @@ public record UserData(
         String password,
         String email
 ) {}
+

@@ -1,5 +1,6 @@
 package server;
 
+import handler.RegisterHandler;
 import io.javalin.*;
 import handler.LoginHandler;
 import io.javalin.http.BadRequestResponse;
@@ -30,7 +31,8 @@ public class Server {
 
     private void createHandlers(Javalin javalin) {
         javalin.get("/health", ctx -> ctx.result("healthy :)"));
-        javalin.post("/user", new LoginHandler());
+        javalin.post("/user", new RegisterHandler());
+        javalin.post("/session", new LoginHandler());
     }
 
     private void createExceptionHandlers(Javalin javalin) {
