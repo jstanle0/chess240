@@ -1,8 +1,8 @@
 package dataaccess;
 
 import models.GameData;
+import models.GamesListResponse;
 
-import java.util.Collection;
 import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO {
@@ -11,8 +11,8 @@ public class MemoryGameDAO implements GameDAO {
 
 
     @Override
-    public Collection<GameData> getGames(){
-        return gameTable.values();
+    public GamesListResponse getGames(){
+        return new GamesListResponse(gameTable.values());
     }
 
     @Override
