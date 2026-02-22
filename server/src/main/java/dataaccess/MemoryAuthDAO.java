@@ -13,7 +13,7 @@ public class MemoryAuthDAO implements AuthDAO {
     public String getUsernameFromToken(UUID token) throws DataAccessException {
         String username = authTable.get(token);
         if (username == null) {
-            throw new DataAccessException("no session associated with username");
+            throw new DataAccessException("no session associated with token");
         }
         return username;
     }

@@ -1,10 +1,7 @@
 package server;
 
-import handler.ClearDBHandler;
-import handler.LogoutHandler;
-import handler.RegisterHandler;
+import handler.*;
 import io.javalin.*;
-import handler.LoginHandler;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ForbiddenResponse;
 import io.javalin.http.NotFoundResponse;
@@ -41,6 +38,10 @@ public class Server {
 
         // Data endpoints
         javalin.delete("/db", new ClearDBHandler());
+
+        // Game endpoints
+        javalin.before("/game", new VerifyAuthMiddleware());
+        javalin.post("/game", new CreateGameHandler());
     }
 
     private void createExceptionHandlers(Javalin javalin) {

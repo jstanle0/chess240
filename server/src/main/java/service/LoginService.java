@@ -56,4 +56,12 @@ public class LoginService {
     public static void logout(UUID token) {
         authDAO.deleteAuth(token);
     }
+
+    public static void verifyAuth(UUID token) throws UnauthorizedResponse {
+        try {
+            authDAO.getUsernameFromToken(token);
+        } catch (DataAccessException e) {
+            throw new UnauthorizedResponse(e.getMessage());
+        }
+    }
 }
