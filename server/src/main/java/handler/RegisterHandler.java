@@ -18,6 +18,9 @@ public class RegisterHandler implements Handler {
         UserData body;
         try {
             body = gson.fromJson(ctx.body(), UserData.class);
+            if (body.username() == null || body.password() == null || body.email() == null) {
+                throw new Exception("missing necessary field");
+            }
         } catch (Exception e) {
             throw new BadRequestResponse(e.getMessage());
         }

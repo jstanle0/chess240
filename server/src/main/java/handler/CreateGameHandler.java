@@ -16,6 +16,9 @@ public class CreateGameHandler implements Handler {
         CreateGameBody data;
         try {
             data = gson.fromJson(context.body(), CreateGameBody.class);
+            if (data.gameName() == null) {
+                throw new Exception("missing game name");
+            }
         } catch (Exception e) {
             throw new BadRequestResponse("failed to parse body: " + e.getMessage());
         }

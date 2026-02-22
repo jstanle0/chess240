@@ -50,27 +50,27 @@ public class Server {
         javalin.exception(BadRequestResponse.class, (e, ctx) -> {
             System.out.println("***Bad request exception: " + e.getMessage());
             ctx.status(400);
-            ctx.json("{\"message\":\"bad request\"}");
+            ctx.json("{\"message\":\"Error: bad request\"}");
         });
         javalin.exception(ForbiddenResponse.class, (e, ctx) -> {
             System.out.println("***Forbidden Action Exception: " + e.getMessage());
             ctx.status(403);
-            ctx.json("{\"message\":\"already taken\"}");
+            ctx.json("{\"message\":\"Error: already taken\"}");
         });
         javalin.exception(UnauthorizedResponse.class, (e, ctx) -> {
             System.out.println("***Unauthorized Exception: " + e.getMessage());
             ctx.status(401);
-            ctx.json("{\"message\":\"unauthorized\"}");
+            ctx.json("{\"message\":\"Error: unauthorized\"}");
         });
         javalin.exception(NotFoundResponse.class, (e, ctx) -> {
             System.out.println("***Not Found Exception: " + e.getMessage());
             ctx.status(404);
-            ctx.json("{\"message\":\"not found\"}");
+            ctx.json("{\"message\":\"Error: not found\"}");
         });
         javalin.exception(Exception.class, (e, ctx) -> {
             System.out.println("***Exception: " + e.getMessage());
             ctx.status(500);
-            ctx.json("{\"message\":\"internal server error: " + e.getMessage() + "\"}");
+            ctx.json("{\"message\":\"Error: internal server error: " + e.getMessage() + "\"}");
         });
     }
 }

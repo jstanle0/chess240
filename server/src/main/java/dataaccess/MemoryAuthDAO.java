@@ -24,8 +24,11 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public void deleteAuth(UUID token) {
-        authTable.remove(token);
+    public void deleteAuth(UUID token) throws DataAccessException {
+        String username = authTable.remove(token);
+        if (username == null) {
+            throw new DataAccessException("session not found");
+        }
     }
 
     @Override

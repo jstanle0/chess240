@@ -17,6 +17,9 @@ public class JoinGameHandler implements Handler {
         JoinGameBody data;
         try {
             data = gson.fromJson(context.body(), JoinGameBody.class);
+            if (data.playerColor() == null || data.gameID() == null) {
+                throw new Exception("missing necessary information");
+            }
         } catch (Exception e) {
             throw new BadRequestResponse("failed to parse body: " + e.getMessage());
         }

@@ -16,7 +16,12 @@ public class VerifyAuthMiddleware implements Handler {
         if (authHeader == null || authHeader.isEmpty()) {
             throw new UnauthorizedResponse("no token present");
         }
-        UUID token = UUID.fromString(authHeader);
+        UUID token;
+        try {
+            token = UUID.fromString(authHeader);
+        } catch (Exception e) {
+            throw new UnauthorizedResponse("token malformed");
+        }
         verifyAuth(token);
     }
 }

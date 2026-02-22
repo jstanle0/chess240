@@ -10,11 +10,14 @@ import static service.LoginService.login;
 
 public class LoginHandler implements Handler {
     @Override
-    public void handle(@NotNull Context context) throws ForbiddenResponse, NotFoundResponse, BadRequestResponse {
+    public void handle(@NotNull Context context) throws ForbiddenResponse, UnauthorizedResponse, BadRequestResponse {
         Gson gson = new Gson();
         LoginUserData data;
         try {
             data = gson.fromJson(context.body(), LoginUserData.class);
+            if (data.username() == null || data.password() == null) {
+                throw new Exception("missing username or password");
+            }
         } catch (Exception e) {
             throw new BadRequestResponse("failed to parse body: " + e.getMessage());
         }

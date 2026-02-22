@@ -43,13 +43,13 @@ public class GameService {
         String whiteUsername;
         String blackUsername;
         if (data.playerColor() == ChessGame.TeamColor.WHITE) {
-            if (!Objects.equals(game.whiteUsername(), "")) {
+            if (game.whiteUsername() != null) {
                 throw new ForbiddenResponse("team already taken");
             }
             whiteUsername = username;
             blackUsername = game.blackUsername();
         } else {
-            if (!Objects.equals(game.blackUsername(), "")) {
+            if (game.blackUsername() != null) {
                 throw new ForbiddenResponse("team already taken");
             }
             blackUsername = username;

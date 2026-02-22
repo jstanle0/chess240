@@ -6,7 +6,7 @@ import models.GamesListResponse;
 import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO {
-    private int nextId = 0;
+    private int nextId = 1;
     private final HashMap<Integer, GameData> gameTable = new HashMap<>();
 
 
@@ -26,7 +26,7 @@ public class MemoryGameDAO implements GameDAO {
 
     @Override
     public GameData createGame(String gameName) {
-        GameData data = new GameData(nextId, "", "", gameName);
+        GameData data = new GameData(nextId, null, null, gameName);
         gameTable.put(nextId, data);
         nextId++;
         return data;
