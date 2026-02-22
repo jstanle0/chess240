@@ -13,7 +13,7 @@ public class VerifyAuthMiddleware implements Handler {
     @Override
     public void handle(@NotNull Context context) throws UnauthorizedResponse {
         String authHeader = context.header("authorization");
-        if (authHeader == null) {
+        if (authHeader == null || authHeader.isEmpty()) {
             throw new UnauthorizedResponse("no token present");
         }
         UUID token = UUID.fromString(authHeader);
