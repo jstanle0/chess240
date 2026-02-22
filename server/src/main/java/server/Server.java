@@ -42,6 +42,7 @@ public class Server {
         // Game endpoints
         javalin.before("/game", new VerifyAuthMiddleware());
         javalin.post("/game", new CreateGameHandler());
+        javalin.put("/game", new JoinGameHandler());
     }
 
     private void createExceptionHandlers(Javalin javalin) {

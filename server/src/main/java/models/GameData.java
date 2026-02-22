@@ -1,7 +1,7 @@
 package models;
 
 public record GameData(
-        Integer gameId,
+        Integer gameID,
         String whiteUsername,
         String blackUsername,
         String gameName
