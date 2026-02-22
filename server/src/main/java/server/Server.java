@@ -1,5 +1,6 @@
 package server;
 
+import handler.ClearDBHandler;
 import handler.LogoutHandler;
 import handler.RegisterHandler;
 import io.javalin.*;
@@ -32,9 +33,14 @@ public class Server {
 
     private void createHandlers(Javalin javalin) {
         javalin.get("/health", ctx -> ctx.result("healthy :)"));
+
+        // User endpoints
         javalin.post("/user", new RegisterHandler());
         javalin.post("/session", new LoginHandler());
         javalin.delete("/session", new LogoutHandler());
+
+        // Data endpoints
+        javalin.delete("/db", new ClearDBHandler());
     }
 
     private void createExceptionHandlers(Javalin javalin) {

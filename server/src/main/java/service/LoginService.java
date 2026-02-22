@@ -14,6 +14,7 @@ import java.util.UUID;
 public class LoginService {
     static UserDAO userDAO = DAOs.getUserDAO();
     static AuthDAO authDAO = DAOs.getAuthDAO();
+
     public static AuthData register(UserData data) throws ForbiddenResponse {
         // Check if user exists
         try {
