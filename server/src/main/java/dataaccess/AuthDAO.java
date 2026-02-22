@@ -19,5 +19,7 @@ public interface AuthDAO {
      */
     String getUsernameFromToken(UUID token) throws DataAccessException;
     void createAuth(AuthData data);
-    void deleteAuth(UUID token) throws DataAccessException;
+    void deleteAuth(UUID token);
+    UUID getTokenFromUsername(String username) throws DataAccessException;
+    void clearTable();
 }

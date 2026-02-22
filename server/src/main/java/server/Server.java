@@ -1,5 +1,6 @@
 package server;
 
+import handler.LogoutHandler;
 import handler.RegisterHandler;
 import io.javalin.*;
 import handler.LoginHandler;
@@ -33,6 +34,7 @@ public class Server {
         javalin.get("/health", ctx -> ctx.result("healthy :)"));
         javalin.post("/user", new RegisterHandler());
         javalin.post("/session", new LoginHandler());
+        javalin.delete("/session", new LogoutHandler());
     }
 
     private void createExceptionHandlers(Javalin javalin) {

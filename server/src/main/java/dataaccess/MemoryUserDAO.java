@@ -19,4 +19,9 @@ public class MemoryUserDAO implements UserDAO {
     public void createUser(UserData data) {
         userTable.put(data.username(), data);
     }
+
+    @Override
+    public void clearTable() {
+        userTable.clear();
+    }
 }

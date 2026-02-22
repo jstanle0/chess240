@@ -36,11 +36,23 @@ public class LoginService {
             if (!Objects.equals(userData.password(), data.password())) {
                 throw new UnauthorizedResponse("incorrect password");
             }
+
+            // Removes an old user session to prevent duplicate sessions
+            try {
+                UUID oldToken = authDAO.getTokenFromUsername(userData.username());
+                authDAO.deleteAuth(oldToken);
+            } catch (DataAccessException e) {
+                // If either of these functions errors, it means the previous session doesn't exist
+            }
             AuthData authData = new AuthData(data.username(), UUID.randomUUID());
             authDAO.createAuth(authData);
             return authData;
         } catch (DataAccessException e) {
             throw new NotFoundResponse(e.getMessage());
         }
+    }
+
+    public static void logout(UUID token) {
+        authDAO.deleteAuth(token);
     }
 }
