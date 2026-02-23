@@ -3,8 +3,6 @@ package dataaccess;
 import models.AuthData;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 public class MemoryAuthDAO implements AuthDAO {
@@ -29,16 +27,6 @@ public class MemoryAuthDAO implements AuthDAO {
         if (username == null) {
             throw new DataAccessException("session not found");
         }
-    }
-
-    @Override
-    public UUID getTokenFromUsername(String username) throws DataAccessException {
-        for (Map.Entry<UUID, String> entry : authTable.entrySet()) {
-            if (Objects.equals(entry.getValue(), username)) {
-                return entry.getKey();
-            }
-        }
-        throw new DataAccessException("user doesn't have active session");
     }
 
     @Override

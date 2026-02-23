@@ -2,7 +2,6 @@ package service;
 
 import dataaccess.*;
 import io.javalin.http.ForbiddenResponse;
-import io.javalin.http.NotFoundResponse;
 import io.javalin.http.UnauthorizedResponse;
 import models.AuthData;
 import models.LoginUserData;
