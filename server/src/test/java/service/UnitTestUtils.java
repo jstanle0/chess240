@@ -5,6 +5,7 @@ import dataaccess.DAOs;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
 import models.AuthData;
+import models.GameData;
 import models.UserData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ public abstract class UnitTestUtils {
     protected static UserData existingUser = new UserData("user1", "secure", "a@a.a");
     protected static UserData newUser = new UserData("user2", "verySecure", "b@b.b");
     protected static UUID existingAuthToken;
+    protected static GameData existingGame;
 
     /**
      * setup pre-populates some data into the different DAOs.
@@ -30,7 +32,7 @@ public abstract class UnitTestUtils {
         UUID token = UUID.randomUUID();
         authDAO.createAuth(new AuthData(existingUser.username(), token));
         existingAuthToken = token;
-        gameDAO.createGame("new game");
+        existingGame = gameDAO.createGame("new game");
     }
 
     @AfterEach
