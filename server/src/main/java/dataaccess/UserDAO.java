@@ -6,7 +6,7 @@ import models.UserData;
  * DAO interface for the User table.
  * Fields:
  * Username: String, unique key
- * Password: String (TODO encrypt)
+ * Password: String
  * Email: String
  */
 public interface UserDAO {
