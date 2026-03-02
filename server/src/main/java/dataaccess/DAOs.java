@@ -1,5 +1,9 @@
 package dataaccess;
 
+import dataaccess.memory.MemoryAuthDAO;
+import dataaccess.memory.MemoryGameDAO;
+import dataaccess.memory.MemoryUserDAO;
+
 /**
  * Class that globally instantiates and serves DAOs
  */
