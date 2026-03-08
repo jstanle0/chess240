@@ -1,6 +1,8 @@
 package dataaccess;
 
 import java.sql.*;
+import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 
 public class DatabaseManager {
@@ -29,6 +31,39 @@ public class DatabaseManager {
         }
     }
 
+    static public void instantiateTables() throws DataAccessException {
+        Collection<String> tableStatements = List.of("""
+                    CREATE TABLE user IF NOT EXISTS (
+                        username varchar(255) PRIMARY KEY,
+                        password varchar(255) NOT NULL,
+                        email varchar(255) NOT NULL
+                    );
+                    """,
+                    """
+                    CREATE TABLE auth IF NOT EXISTS (
+                        token varchar(255) PRIMARY KEY,
+                        username varchar(255) NOT NULL
+                    );
+                    """,
+                    """
+                    CREATE TABLE game IF NOT EXISTS (
+                        game_id int PRIMARY KEY AUTO_INCREMENT,
+                        white_username varchar(255),
+                        black_username varchar(255),
+                        game_name varchar(255) NOT NULL
+                    );
+                    """
+                );
+        for (String statement : tableStatements) {
+            try (Connection connection = DatabaseManager.getConnection()) {
+                var userStatement = connection.prepareStatement(statement);
+                userStatement.executeUpdate();
+            } catch (SQLException e) {
+                throw new DataAccessException(e.getMessage());
+            }
+        }
+    }
+
     /**
      * Create a connection to the database and sets the catalog based upon the
      * properties specified in db.properties. Connections to the database should
@@ -41,7 +76,7 @@ public class DatabaseManager {
      * }
      * </code>
      */
-    static Connection getConnection() throws DataAccessException {
+    static public Connection getConnection() throws DataAccessException {
         try {
             //do not wrap the following line with a try-with-resources
             var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
