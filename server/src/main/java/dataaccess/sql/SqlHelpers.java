@@ -3,13 +3,11 @@ package dataaccess.sql;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 
-import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.function.Function;
 
@@ -19,7 +17,7 @@ public class SqlHelpers {
 
     protected int executeUpdate(String statement, Object... params) throws SQLException {
         try (var conn = DatabaseManager.getConnection();
-            var preparedStatement = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)
+             var preparedStatement = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)
         ) {
             setParams(preparedStatement, params);
             preparedStatement.executeUpdate();

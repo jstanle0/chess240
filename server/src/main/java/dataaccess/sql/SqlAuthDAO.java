@@ -17,7 +17,7 @@ public class SqlAuthDAO extends SqlHelpers implements AuthDAO {
     public void createAuth(AuthData data) {
         String statement = "INSERT INTO auth (token, username) VALUES (?, ?)";
         try {
-            executeUpdate(statement, data.authToken(), data.username());
+            executeUpdate(statement, data.authToken().toString(), data.username());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
