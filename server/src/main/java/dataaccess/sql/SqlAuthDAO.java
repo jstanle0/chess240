@@ -4,13 +4,31 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import models.AuthData;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
 public class SqlAuthDAO extends SqlHelpers implements AuthDAO {
+    private String rsToString(ResultSet rs) {
+        try {
+            return rs.getString(1);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public String getUsernameFromToken(UUID token) throws DataAccessException {
-        return "";
+        String statement = "SELECT username FROM auth WHERE token = ?";
+        try {
+            var result = executeQuery(statement, this::rsToString, token.toString());
+            for (var s : result) {
+                return s;
+            }
+            throw new DataAccessException("no active session found");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
