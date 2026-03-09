@@ -27,26 +27,27 @@ public class DatabaseManager {
              var preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
             throw new DataAccessException("failed to create database", ex);
         }
     }
 
     static public void instantiateTables() throws DataAccessException {
         Collection<String> tableStatements = List.of("""
-                    CREATE TABLE user IF NOT EXISTS (
+                    CREATE TABLE IF NOT EXISTS user (
                         username varchar(255) PRIMARY KEY,
                         password varchar(255) NOT NULL,
                         email varchar(255) NOT NULL
                     );
                     """,
                     """
-                    CREATE TABLE auth IF NOT EXISTS (
+                    CREATE TABLE IF NOT EXISTS auth (
                         token varchar(255) PRIMARY KEY,
                         username varchar(255) NOT NULL
                     );
                     """,
                     """
-                    CREATE TABLE game IF NOT EXISTS (
+                    CREATE TABLE IF NOT EXISTS game (
                         game_id int PRIMARY KEY AUTO_INCREMENT,
                         white_username varchar(255),
                         black_username varchar(255),
@@ -59,6 +60,7 @@ public class DatabaseManager {
                 var userStatement = connection.prepareStatement(statement);
                 userStatement.executeUpdate();
             } catch (SQLException e) {
+                System.out.println("table creation failed " + e.getMessage());
                 throw new DataAccessException(e.getMessage());
             }
         }
