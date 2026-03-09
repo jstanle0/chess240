@@ -20,13 +20,13 @@ public class SqlHelpers {
              var preparedStatement = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)
         ) {
             setParams(preparedStatement, params);
-            preparedStatement.executeUpdate();
+            int result = preparedStatement.executeUpdate();
             try (ResultSet resultSet = preparedStatement.getResultSet()) {
                 if (resultSet != null && resultSet.next()) {
                     return resultSet.getInt(1);
                 }
             }
-            return 0;
+            return result;
         } catch (DataAccessException e) {
             throw new SQLException(e);
         }

@@ -43,7 +43,15 @@ public class SqlAuthDAO extends SqlHelpers implements AuthDAO {
 
     @Override
     public void deleteAuth(UUID token) throws DataAccessException {
-
+        String statement = "DELETE FROM auth WHERE token = ?";
+        try {
+            int result = executeUpdate(statement, token.toString());
+            if (result == 0) {
+                throw new DataAccessException("no active session");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
