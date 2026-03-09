@@ -6,7 +6,7 @@ import models.AuthData;
 
 import java.util.UUID;
 
-public class SqlAuthDAO implements AuthDAO {
+public class SqlAuthDAO extends SqlHelpers implements AuthDAO {
     @Override
     public String getUsernameFromToken(UUID token) throws DataAccessException {
         return "";
@@ -24,6 +24,10 @@ public class SqlAuthDAO implements AuthDAO {
 
     @Override
     public void clearTable() {
-
+        String statement = "TRUNCATE auth";
+        try { executeUpdate(statement); }
+        catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

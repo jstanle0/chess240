@@ -5,7 +5,7 @@ import dataaccess.GameDAO;
 import models.GameData;
 import models.GamesListResponse;
 
-public class SqlGameDAO implements GameDAO {
+public class SqlGameDAO extends SqlHelpers implements GameDAO {
     @Override
     public GamesListResponse getGames() {
         return null;
@@ -28,6 +28,10 @@ public class SqlGameDAO implements GameDAO {
 
     @Override
     public void clearTable() {
-
+        String statement = "TRUNCATE game";
+        try { executeUpdate(statement); }
+        catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
