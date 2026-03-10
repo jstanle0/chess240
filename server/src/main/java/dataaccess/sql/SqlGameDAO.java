@@ -60,9 +60,9 @@ public class SqlGameDAO extends SqlHelpers implements GameDAO {
 
     @Override
     public void updateGame(GameData game) {
-        String statement = "UPDATE game SET white_username = ?, black_username = ?";
+        String statement = "UPDATE game SET white_username = ?, black_username = ? WHERE game_id = ?";
         try {
-            executeUpdate(statement, game.whiteUsername(), game.blackUsername());
+            executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameID());
         } catch (SQLException e) {
             throw new RuntimeException("Failed to update game: " + e);
         }
