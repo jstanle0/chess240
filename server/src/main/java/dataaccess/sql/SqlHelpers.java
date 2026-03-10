@@ -21,7 +21,7 @@ public class SqlHelpers {
         ) {
             setParams(preparedStatement, params);
             int result = preparedStatement.executeUpdate();
-            try (ResultSet resultSet = preparedStatement.getResultSet()) {
+            try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                 if (resultSet != null && resultSet.next()) {
                     return resultSet.getInt(1);
                 }
