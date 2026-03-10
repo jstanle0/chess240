@@ -21,7 +21,7 @@ public abstract class UnitTestUtils {
 
     protected static UserData existingUserHashed = new UserData("user1", BCrypt.hashpw("secure", BCrypt.gensalt()), "a@a.a");
     protected static UserData existingUser = new UserData("user1", "secure", "a@a.a");
-    protected static UserData newUser = new UserData("user2", BCrypt.hashpw("verySecure", BCrypt.gensalt()), "b@b.b");
+    protected static UserData newUser = new UserData("user2", "verySecure", "b@b.b");
     protected static UUID existingAuthToken;
     protected static GameData existingGame;
 
