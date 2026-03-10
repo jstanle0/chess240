@@ -94,4 +94,14 @@ public class SqlGameDAO extends SqlHelpers implements GameDAO {
             throw new RuntimeException(e);
         }
     }
+
+    public void updateGameObject(Integer gameId, ChessGame newObject) {
+        String statement = "UPDATE game SET game = ? WHERE game_id = ?";
+        try {
+            var gson = new Gson();
+            executeUpdate(statement, gson.toJson(newObject), gameId);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update game: " + e);
+        }
+    }
 }
