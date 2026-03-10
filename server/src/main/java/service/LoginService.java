@@ -6,8 +6,8 @@ import io.javalin.http.UnauthorizedResponse;
 import models.AuthData;
 import models.LoginUserData;
 import models.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
-import java.util.Objects;
 import java.util.UUID;
 
 public class LoginService {
@@ -22,8 +22,9 @@ public class LoginService {
         } catch (DataAccessException e) {
             //Ignore data access exceptions. This is the correct path
         }
+        var hashedData = new UserData(data.username(), BCrypt.hashpw(data.password(), BCrypt.gensalt()), data.email());
         // Create new user
-        userDAO.createUser(data);
+        userDAO.createUser(hashedData);
         // Login the user
         AuthData authData = new AuthData(data.username(), UUID.randomUUID());
         authDAO.createAuth(authData);
@@ -33,7 +34,7 @@ public class LoginService {
     public static AuthData login(LoginUserData data) throws UnauthorizedResponse {
         try {
             UserData userData = userDAO.getUser(data.username());
-            if (!Objects.equals(userData.password(), data.password())) {
+            if (!BCrypt.checkpw(data.password(), userData.password())) {
                 throw new UnauthorizedResponse("incorrect password");
             }
 
