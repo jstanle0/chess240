@@ -64,4 +64,12 @@ public class SqlHelpers {
             }
         }
     }
+
+    protected String rsToString(ResultSet rs) {
+        try {
+            return rs.getString(1);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

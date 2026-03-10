@@ -51,7 +51,8 @@ public class DatabaseManager {
                         game_id int PRIMARY KEY AUTO_INCREMENT,
                         white_username varchar(255),
                         black_username varchar(255),
-                        game_name varchar(255) NOT NULL
+                        game_name varchar(255) NOT NULL,
+                        game text
                     );
                     """
                 );

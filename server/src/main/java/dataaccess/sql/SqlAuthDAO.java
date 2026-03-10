@@ -9,14 +9,6 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 public class SqlAuthDAO extends SqlHelpers implements AuthDAO {
-    private String rsToString(ResultSet rs) {
-        try {
-            return rs.getString(1);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     public String getUsernameFromToken(UUID token) throws DataAccessException {
         String statement = "SELECT username FROM auth WHERE token = ?";

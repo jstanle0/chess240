@@ -1,5 +1,7 @@
 package dataaccess.sql;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import models.GameData;
@@ -49,9 +51,11 @@ public class SqlGameDAO extends SqlHelpers implements GameDAO {
 
     @Override
     public GameData createGame(String gameName) {
-        String statement = "INSERT INTO game (game_name) VALUES (?)";
+        String statement = "INSERT INTO game (game_name, game) VALUES (?, ?)";
         try {
-            var id = executeUpdate(statement, gameName);
+            var gson = new Gson();
+            var game = new ChessGame();
+            var id = executeUpdate(statement, gameName, gson.toJson(game));
             return new GameData(id, "", "", gameName);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to create game: " + e);
@@ -74,6 +78,20 @@ public class SqlGameDAO extends SqlHelpers implements GameDAO {
         try { executeUpdate(statement); }
         catch (SQLException e) {
             throw new RuntimeException("Failed to clear table: " + e);
+        }
+    }
+
+    public ChessGame getGameObject(Integer gameId) throws DataAccessException {
+        String query = "SELECT game FROM game WHERE game_id = ?";
+        try {
+            var gson = new Gson();
+            var response = executeQuery(query, this::rsToString, gameId);
+            for (var r : response) {
+                return gson.fromJson(r, ChessGame.class);
+            }
+            throw new DataAccessException("No game found");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }
