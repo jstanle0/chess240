@@ -5,27 +5,67 @@ import dataaccess.GameDAO;
 import models.GameData;
 import models.GamesListResponse;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SqlGameDAO extends SqlHelpers implements GameDAO {
+
+    private GameData rsToGameData(ResultSet rs) {
+        try {
+            return new GameData(
+                    rs.getInt(1),
+                    rs.getString(2),
+                    rs.getString(3),
+                    rs.getString(4)
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public GamesListResponse getGames() {
-        return null;
+        String query = "SELECT game_id, white_username, black_username, game_name FROM game";
+        try {
+            return new GamesListResponse(executeQuery(query, this::rsToGameData));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public GameData getGame(Integer gameId) throws DataAccessException {
-        return null;
+        String query = "SELECT game_id, white_username, black_username, game_name FROM game WHERE game_id = ?";
+        try {
+            var response = executeQuery(query, this::rsToGameData, gameId);
+            for (var game : response) {
+                return game;
+            }
+            throw new DataAccessException("No game found");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public GameData createGame(String gameName) {
-        return null;
+        String statement = "INSERT INTO game (game_name) VALUES (?)";
+        try {
+            var id = executeUpdate(statement, gameName);
+            return new GameData(id, "", "", gameName);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to create game: " + e);
+        }
     }
 
     @Override
     public void updateGame(GameData game) {
-
+        String statement = "UPDATE game SET white_username = ?, black_username = ?";
+        try {
+            executeUpdate(statement, game.whiteUsername(), game.blackUsername());
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update game: " + e);
+        }
     }
 
     @Override
@@ -33,7 +73,7 @@ public class SqlGameDAO extends SqlHelpers implements GameDAO {
         String statement = "TRUNCATE game";
         try { executeUpdate(statement); }
         catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to clear table: " + e);
         }
     }
 }
