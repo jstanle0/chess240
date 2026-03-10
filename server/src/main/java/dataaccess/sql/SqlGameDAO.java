@@ -81,6 +81,7 @@ public class SqlGameDAO extends SqlHelpers implements GameDAO {
         }
     }
 
+    @Override
     public ChessGame getGameObject(Integer gameId) throws DataAccessException {
         String query = "SELECT game FROM game WHERE game_id = ?";
         try {
@@ -95,6 +96,7 @@ public class SqlGameDAO extends SqlHelpers implements GameDAO {
         }
     }
 
+    @Override
     public void updateGameObject(Integer gameId, ChessGame newObject) {
         String statement = "UPDATE game SET game = ? WHERE game_id = ?";
         try {

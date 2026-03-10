@@ -1,5 +1,6 @@
 package dataaccess.memory;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import models.GameData;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 public class MemoryGameDAO implements GameDAO {
     private int nextId = 1;
     private final HashMap<Integer, GameData> gameTable = new HashMap<>();
+    private final HashMap<Integer, ChessGame> gameObjectTable = new HashMap<>();
 
 
     @Override
@@ -30,6 +32,7 @@ public class MemoryGameDAO implements GameDAO {
     public GameData createGame(String gameName) {
         GameData data = new GameData(nextId, null, null, gameName);
         gameTable.put(nextId, data);
+        gameObjectTable.put(nextId, new ChessGame());
         nextId++;
         return data;
     }
@@ -42,5 +45,20 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public void clearTable() {
         gameTable.clear();
+        gameObjectTable.clear();
+    }
+
+    @Override
+    public ChessGame getGameObject(Integer gameId) throws DataAccessException {
+        ChessGame game = gameObjectTable.get(gameId);
+        if (game == null) {
+            throw new DataAccessException("no game object found");
+        }
+        return game;
+    }
+
+    @Override
+    public void updateGameObject(Integer gameId, ChessGame newGame) {
+        gameObjectTable.put(gameId, newGame);
     }
 }
