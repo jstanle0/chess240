@@ -4,6 +4,7 @@ import chess.ChessGame;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ForbiddenResponse;
 import models.GameData;
+import models.GamesListResponse;
 import models.JoinGameBody;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,8 @@ public class GameServiceTest extends UnitTestUtils {
         Assertions.assertEquals(1, gameDAO.getGames().games().size());
         GameData newGame = gameDAO.createGame("game 2");
         Assertions.assertEquals(2, gameDAO.getGames().games().size());
-        Assertions.assertTrue(gameDAO.getGames().games().contains(newGame));
+        GamesListResponse res = gameDAO.getGames();
+        Assertions.assertTrue(res.games().contains(newGame));
     }
 
     @Test

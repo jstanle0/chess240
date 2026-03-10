@@ -4,7 +4,6 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import models.AuthData;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 

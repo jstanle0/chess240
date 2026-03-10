@@ -56,7 +56,7 @@ public class SqlGameDAO extends SqlHelpers implements GameDAO {
             var gson = new Gson();
             var game = new ChessGame();
             var id = executeUpdate(statement, gameName, gson.toJson(game));
-            return new GameData(id, "", "", gameName);
+            return new GameData(id, null, null, gameName);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to create game: " + e);
         }

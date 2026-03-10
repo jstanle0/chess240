@@ -34,8 +34,12 @@ public class LoginService {
     public static AuthData login(LoginUserData data) throws UnauthorizedResponse {
         try {
             UserData userData = userDAO.getUser(data.username());
-            if (!BCrypt.checkpw(data.password(), userData.password())) {
-                throw new UnauthorizedResponse("incorrect password");
+            try {
+                if (!BCrypt.checkpw(data.password(), userData.password())) {
+                    throw new UnauthorizedResponse("incorrect password");
+                }
+            } catch (Exception e) {
+                throw new UnauthorizedResponse("password failed authentication");
             }
 
             AuthData authData = new AuthData(data.username(), UUID.randomUUID());
