@@ -35,7 +35,7 @@ public class SqlHelpers {
     protected <T> Collection<T> executeQuery(String query, Function<ResultSet, T> mapper, Object... params) throws SQLException {
         try (
                 var conn = DatabaseManager.getConnection();
-                var preparedStatement = conn.prepareStatement(query);
+                var preparedStatement = conn.prepareStatement(query)
         ) {
             setParams(preparedStatement, params);
             var rs = preparedStatement.executeQuery();
