@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * Class that globally instantiates and serves DAOs
  */
 public class DAOs {
-    private static final Logger logger = LoggerFactory.getLogger(DAOs.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DAOs.class);
     // toggle this boolean to change between memory and SQL DAOs
     private static Boolean useDB = true;
     private static final AuthDAO AUTH_DAO;
@@ -26,7 +26,7 @@ public class DAOs {
                 DatabaseManager.createDatabase();
                 DatabaseManager.instantiateTables();
             } catch (DataAccessException e) {
-                logger.error("Failed to connect to database. Defaulting to memory.");
+                LOGGER.error("Failed to connect to database. Defaulting to memory.");
                 useDB = false;
             }
         }

@@ -11,29 +11,29 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class GameDAOTest {
-    private static final GameDAO gameDAO = DAOs.getGameDAO();
+    private static final GameDAO GAME_DAO = DAOs.getGameDAO();
 
     @BeforeEach
     @AfterEach
     void clear() {
-        gameDAO.clearTable();
+        GAME_DAO.clearTable();
     }
 
     @Test
     void testClearTable() {
         var data = initializeDAO();
-        Assertions.assertDoesNotThrow(gameDAO::clearTable);
-        Assertions.assertThrows(DataAccessException.class, () -> gameDAO.getGame(data.gameID()));
+        Assertions.assertDoesNotThrow(GAME_DAO::clearTable);
+        Assertions.assertThrows(DataAccessException.class, () -> GAME_DAO.getGame(data.gameID()));
     }
 
     @Test
     void testCreateGame() {
-        Assertions.assertDoesNotThrow(() -> gameDAO.createGame("test"));
+        Assertions.assertDoesNotThrow(() -> GAME_DAO.createGame("test"));
     }
 
     @Test
     void testGetGamesEmpty() {
-        GamesListResponse res = Assertions.assertDoesNotThrow(gameDAO::getGames);
+        GamesListResponse res = Assertions.assertDoesNotThrow(GAME_DAO::getGames);
         Assertions.assertTrue(res.games().isEmpty());
     }
 
@@ -41,7 +41,7 @@ public class GameDAOTest {
     void testGetGames() {
         initializeDAO();
         var data = initializeDAO();
-        GamesListResponse res = Assertions.assertDoesNotThrow(gameDAO::getGames);
+        GamesListResponse res = Assertions.assertDoesNotThrow(GAME_DAO::getGames);
         Assertions.assertEquals(2, res.games().size());
         Assertions.assertTrue(res.games().contains(data));
     }
@@ -49,13 +49,13 @@ public class GameDAOTest {
     @Test
     void testGetGame() {
         var data = initializeDAO();
-        var game = Assertions.assertDoesNotThrow(() -> gameDAO.getGame(data.gameID()));
+        var game = Assertions.assertDoesNotThrow(() -> GAME_DAO.getGame(data.gameID()));
         Assertions.assertEquals(data, game);
     }
 
     @Test
     void testFailedGetGame() {
-        Assertions.assertThrows(DataAccessException.class, () -> gameDAO.getGame(999));
+        Assertions.assertThrows(DataAccessException.class, () -> GAME_DAO.getGame(999));
     }
 
     @Test
@@ -63,9 +63,9 @@ public class GameDAOTest {
         var firstData = initializeDAO();
         var secondData = initializeDAO();
         var newData = new GameData(firstData.gameID(), null, "b", firstData.gameName());
-        Assertions.assertDoesNotThrow(() -> gameDAO.updateGame(newData));
-        var dataFromDb = Assertions.assertDoesNotThrow( () -> gameDAO.getGame(newData.gameID()));
-        var secondDataFromDb = Assertions.assertDoesNotThrow( () -> gameDAO.getGame(secondData.gameID()));
+        Assertions.assertDoesNotThrow(() -> GAME_DAO.updateGame(newData));
+        var dataFromDb = Assertions.assertDoesNotThrow( () -> GAME_DAO.getGame(newData.gameID()));
+        var secondDataFromDb = Assertions.assertDoesNotThrow( () -> GAME_DAO.getGame(secondData.gameID()));
         Assertions.assertEquals(newData, dataFromDb);
         Assertions.assertNotEquals(secondDataFromDb.blackUsername(), dataFromDb.blackUsername());
     }
@@ -73,28 +73,28 @@ public class GameDAOTest {
     @Test
     void testGetGameObject() {
         var data = initializeDAO();
-        var game = Assertions.assertDoesNotThrow(() -> gameDAO.getGameObject(data.gameID()));
+        var game = Assertions.assertDoesNotThrow(() -> GAME_DAO.getGameObject(data.gameID()));
         Assertions.assertEquals(new ChessGame(), game);
     }
 
     @Test
     void testFailedGetGameObject() {
-        Assertions.assertThrows(DataAccessException.class, () -> gameDAO.getGameObject(999));
+        Assertions.assertThrows(DataAccessException.class, () -> GAME_DAO.getGameObject(999));
     }
 
     @Test
     void testUpdateGameObject() {
         var data = initializeDAO();
-        var game = Assertions.assertDoesNotThrow( () -> gameDAO.getGameObject(data.gameID()));
+        var game = Assertions.assertDoesNotThrow( () -> GAME_DAO.getGameObject(data.gameID()));
         Assertions.assertDoesNotThrow(
                 () -> game.makeMove(new ChessMove(new ChessPosition(2,1), new ChessPosition(3, 1), null))
         );
-        Assertions.assertDoesNotThrow( () -> gameDAO.updateGameObject(data.gameID(), game));
-        var gameFromDb = Assertions.assertDoesNotThrow( () -> gameDAO.getGameObject(data.gameID()));
+        Assertions.assertDoesNotThrow( () -> GAME_DAO.updateGameObject(data.gameID(), game));
+        var gameFromDb = Assertions.assertDoesNotThrow( () -> GAME_DAO.getGameObject(data.gameID()));
         Assertions.assertEquals(game, gameFromDb);
     }
 
     private GameData initializeDAO() {
-        return gameDAO.createGame("a");
+        return GAME_DAO.createGame("a");
     }
 }
