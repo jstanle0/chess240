@@ -10,6 +10,6 @@ public class ClientMain {
         }
 
         var client = new Client(serverUrl);
-
+        client.run();
     }
 }
