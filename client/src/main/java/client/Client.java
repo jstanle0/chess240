@@ -1,10 +1,7 @@
 package client;
 
 import http.ServerFacade;
-import models.ExitException;
-import models.LoginUserData;
-import models.ResponseException;
-import models.UserData;
+import models.*;
 import ui.IOManager;
 
 import java.util.Scanner;
@@ -41,6 +38,8 @@ public class Client {
             case 3 -> handleLogin();
             case 4 -> handleRegister();
             case 12 -> handleLogout();
+            case 13 -> handleCreateGame();
+            case 14 -> handleListGames();
             case null, default -> ioManager.printHelp(authToken != null);
         }
     }
@@ -51,6 +50,7 @@ public class Client {
             var response = server.login(data);
             authToken = response.authToken();
             System.out.println("Successfully logged in.");
+            ioManager.printHelp(true);
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 3);
         }
@@ -62,6 +62,7 @@ public class Client {
             var response = server.createAccount(data);
             authToken = response.authToken();
             System.out.println("Successfully created account.");
+            ioManager.printHelp(true);
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 4);
         }
@@ -74,6 +75,25 @@ public class Client {
             System.out.println("Successfully logged out.");
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 12);
+        }
+    }
+
+    private void handleCreateGame() {
+        CreateGameBody body = ioManager.getCreateGameData();
+        try {
+            var gameData = server.createGame(body, authToken.toString());
+            System.out.println("Game " + gameData.gameName() + " has been created. The game id is " + gameData.gameID() + ".");
+        } catch (ResponseException e) {
+            ioManager.printResponseError(e, 13);
+        }
+    }
+
+    private void handleListGames() {
+        try {
+            var gameListData = server.listGames(authToken.toString());
+            ioManager.printGameList(gameListData);
+        } catch (ResponseException e) {
+            ioManager.printResponseError(e, 14);
         }
     }
 }

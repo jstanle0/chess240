@@ -1,5 +1,7 @@
 package ui;
 
+import models.CreateGameBody;
+import models.GamesListResponse;
 import models.LoginUserData;
 import models.UserData;
 
@@ -39,5 +41,26 @@ abstract public class IOHelpers {
         var password = scanner.nextLine();
 
         return new LoginUserData(username, password);
+    }
+
+    public CreateGameBody getCreateGameData() {
+        if (cachedCommand != null && cachedCommand.length == 2) {
+            return new CreateGameBody(cachedCommand[1]);
+        }
+
+        System.out.println("Enter the name of the game: ");
+        return new CreateGameBody(scanner.nextLine());
+    }
+
+    public void printGameList(GamesListResponse gameList) {
+        if (gameList.games().isEmpty()) {
+            System.out.println("There are not any active games right now.");
+        }
+        for (var game : gameList.games()) {
+            System.out.println("Game #" + game.gameID() + ": " + game.gameName());
+            System.out.println("White player: " + (game.whiteUsername() != null ? game.whiteUsername() : "OPEN"));
+            System.out.println("Black player: " + (game.blackUsername() != null ? game.blackUsername() : "OPEN"));
+            System.out.println();
+        }
     }
 }
