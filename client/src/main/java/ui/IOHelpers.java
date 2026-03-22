@@ -1,9 +1,7 @@
 package ui;
 
-import models.CreateGameBody;
-import models.GamesListResponse;
-import models.LoginUserData;
-import models.UserData;
+import chess.ChessGame;
+import models.*;
 
 import java.util.Scanner;
 
@@ -57,10 +55,43 @@ abstract public class IOHelpers {
             System.out.println("There are not any active games right now.");
         }
         for (var game : gameList.games()) {
-            System.out.println("Game #" + game.gameID() + ": " + game.gameName());
-            System.out.println("White player: " + (game.whiteUsername() != null ? game.whiteUsername() : "OPEN"));
-            System.out.println("Black player: " + (game.blackUsername() != null ? game.blackUsername() : "OPEN"));
-            System.out.println();
+            printGame(game);
+        }
+    }
+
+    public void printGame(GameData game) {
+        System.out.println("Game #" + game.gameID() + ": " + game.gameName());
+        System.out.println("White player: " + (game.whiteUsername() != null ? game.whiteUsername() : "OPEN"));
+        System.out.println("Black player: " + (game.blackUsername() != null ? game.blackUsername() : "OPEN"));
+        System.out.println();
+    }
+
+    public JoinGameBody getJoinGameData() throws ResponseException {
+        if (cachedCommand != null && cachedCommand.length == 3) {
+            return new JoinGameBody(getColorFromString(cachedCommand[2]), getIntegerFromString(cachedCommand[3]));
+        }
+        System.out.print("Select team color: ");
+        var color = getColorFromString(scanner.nextLine());
+        System.out.print("Select game id: ");
+        var id = getIntegerFromString(scanner.nextLine());
+
+        return new JoinGameBody(color, id);
+    }
+
+    private ChessGame.TeamColor getColorFromString(String s) throws ResponseException {
+        if (s.equalsIgnoreCase("white") || s.equalsIgnoreCase("w")) {
+            return ChessGame.TeamColor.WHITE;
+        } else if (s.equalsIgnoreCase("black") || s.equalsIgnoreCase("b")) {
+            return ChessGame.TeamColor.BLACK;
+        }
+        throw new ResponseException("invalid team color", 400);
+    }
+
+    private Integer getIntegerFromString(String s) throws ResponseException {
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            throw new ResponseException("invalid game id", 400);
         }
     }
 }

@@ -4,6 +4,7 @@ import http.ServerFacade;
 import models.*;
 import ui.IOManager;
 
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -40,6 +41,7 @@ public class Client {
             case 12 -> handleLogout();
             case 13 -> handleCreateGame();
             case 14 -> handleListGames();
+            case 15 -> handleJoinGame();
             case null, default -> ioManager.printHelp(authToken != null);
         }
     }
@@ -96,4 +98,21 @@ public class Client {
             ioManager.printResponseError(e, 14);
         }
     }
+
+    private void handleJoinGame() {
+        try {
+            var body = ioManager.getJoinGameData();
+            server.joinGame(body, authToken.toString());
+            System.out.println("Successfully joined game.");
+            var games = server.listGames(authToken.toString());
+            var updatedGame = games.games().stream().filter(game -> Objects.equals(game.gameID(), body.gameID())).findFirst();
+            if (updatedGame.isEmpty()) {
+                throw new ResponseException("game not found", 404);
+            }
+            ioManager.printGame(updatedGame.get());
+        } catch (ResponseException e) {
+            ioManager.printResponseError(e, 15);
+        }
+    }
+
 }
