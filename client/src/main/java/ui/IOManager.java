@@ -1,5 +1,6 @@
 package ui;
 
+import models.LoginUserData;
 import models.ResponseException;
 import models.UserData;
 
@@ -90,5 +91,17 @@ public class IOManager {
         var email = scanner.nextLine();
 
         return new UserData(username, password, email);
+    }
+
+    public LoginUserData getLoginData() {
+        if (cachedCommand != null && cachedCommand.length == 3) {
+            return new LoginUserData(cachedCommand[1], cachedCommand[2]);
+        }
+        System.out.println("Enter your username: ");
+        var username = scanner.nextLine();
+        System.out.println("Enter your password: ");
+        var password = scanner.nextLine();
+
+        return new LoginUserData(username, password);
     }
 }

@@ -2,6 +2,7 @@ package client;
 
 import http.ServerFacade;
 import models.ExitException;
+import models.LoginUserData;
 import models.ResponseException;
 import models.UserData;
 import ui.IOManager;
@@ -37,13 +38,21 @@ public class Client {
     private void handleCommand(Integer code) throws ExitException {
         switch (code) {
             case 2 -> throw new ExitException();
+            case 3 -> handleLogin();
             case 4 -> handleRegister();
             case null, default -> ioManager.printHelp(authToken != null);
         }
     }
 
     private void handleLogin() {
-
+        LoginUserData data = ioManager.getLoginData();
+        try {
+            var response = server.login(data);
+            authToken = response.authToken();
+            System.out.println("Successfully logged in.");
+        } catch (ResponseException e) {
+            ioManager.printResponseError(e, 3);
+        }
     }
 
     private void handleRegister() {
