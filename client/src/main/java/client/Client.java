@@ -40,6 +40,7 @@ public class Client {
             case 2 -> throw new ExitException();
             case 3 -> handleLogin();
             case 4 -> handleRegister();
+            case 12 -> handleLogout();
             case null, default -> ioManager.printHelp(authToken != null);
         }
     }
@@ -63,6 +64,16 @@ public class Client {
             System.out.println("Successfully created account.");
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 4);
+        }
+    }
+
+    private void handleLogout() {
+        try {
+            server.logout(authToken.toString());
+            authToken = null;
+            System.out.println("Successfully logged out.");
+        } catch (ResponseException e) {
+            ioManager.printResponseError(e, 12);
         }
     }
 }

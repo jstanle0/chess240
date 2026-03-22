@@ -16,16 +16,21 @@ public class ServerFacade {
     public ServerFacade(String url) { serverUrl = url; }
 
     public AuthData createAccount(UserData body) throws ResponseException {
-        var req = createRequest("POST", "/user", body);
+        var req = createRequest("POST", "/user", body, null);
         return makeRequest(req, AuthData.class);
     }
 
     public AuthData login(LoginUserData body) throws ResponseException {
-        var req = createRequest("POST", "/session", body);
+        var req = createRequest("POST", "/session", body, null);
         return makeRequest(req, AuthData.class);
     }
 
-    private HttpRequest createRequest(String method, String path, Object body) {
+    public void logout(String authToken) throws ResponseException {
+        var req = createRequest("DELETE", "/session", null, authToken);
+        makeRequest(req, null);
+    }
+
+    private HttpRequest createRequest(String method, String path, Object body, String authToken) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .method(method,
@@ -34,6 +39,9 @@ public class ServerFacade {
                                 HttpRequest.BodyPublishers.noBody());
         if (body != null) {
             request.setHeader("Content-Type", "application/json");
+        }
+        if (authToken != null) {
+            request.setHeader("Authorization", authToken);
         }
         return request.build();
     }
@@ -48,7 +56,10 @@ public class ServerFacade {
                 throw new ResponseException(body.message(), response.statusCode());
             }
 
-            return gson.fromJson(response.body(), responseClass);
+            if (responseClass != null) {
+                return gson.fromJson(response.body(), responseClass);
+            }
+            return null;
         } catch (IOException | InterruptedException e) {
             throw new ResponseException(e, 0);
         }

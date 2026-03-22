@@ -5,6 +5,10 @@ import models.UserData;
 
 import java.util.Scanner;
 
+/**
+ * Contains extra helper functions for IOManager.
+ * Has the functions that get specific objects for the client.
+ */
 abstract public class IOHelpers {
     protected Scanner scanner;
     protected String[] cachedCommand;
