@@ -1,7 +1,9 @@
 package client;
 
+import chess.ChessGame;
 import http.ServerFacade;
 import models.*;
+import ui.GamePrinter;
 import ui.IOManager;
 
 import java.util.Objects;
@@ -118,6 +120,7 @@ public class Client {
         try {
             var id = ioManager.getObserveGameData();
             printUpdatedGame(id);
+            GamePrinter.printBoard(new ChessGame().getBoard(), ChessGame.TeamColor.WHITE);
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 15);
         }

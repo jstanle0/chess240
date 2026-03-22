@@ -4,7 +4,7 @@ import models.ResponseException;
 
 import java.util.Scanner;
 
-import static ui.EscapeSequences.WHITE_KING;
+import static ui.EscapeSequences.*;
 
 public class IOManager extends IOHelpers {
 
