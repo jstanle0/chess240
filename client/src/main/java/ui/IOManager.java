@@ -1,8 +1,6 @@
 package ui;
 
-import models.LoginUserData;
 import models.ResponseException;
-import models.UserData;
 
 import java.util.Scanner;
 

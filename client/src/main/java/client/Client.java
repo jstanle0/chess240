@@ -42,6 +42,7 @@ public class Client {
             case 13 -> handleCreateGame();
             case 14 -> handleListGames();
             case 15 -> handleJoinGame();
+            case 16 -> handleObserveGame();
             case null, default -> ioManager.printHelp(authToken != null);
         }
     }
@@ -104,15 +105,31 @@ public class Client {
             var body = ioManager.getJoinGameData();
             server.joinGame(body, authToken.toString());
             System.out.println("Successfully joined game.");
-            var games = server.listGames(authToken.toString());
-            var updatedGame = games.games().stream().filter(game -> Objects.equals(game.gameID(), body.gameID())).findFirst();
-            if (updatedGame.isEmpty()) {
-                throw new ResponseException("game not found", 404);
-            }
-            ioManager.printGame(updatedGame.get());
+            printUpdatedGame(body.gameID());
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 15);
         }
+    }
+
+    /**
+     * Placeholder for websockets
+     */
+    private void handleObserveGame() {
+        try {
+            var id = ioManager.getObserveGameData();
+            printUpdatedGame(id);
+        } catch (ResponseException e) {
+            ioManager.printResponseError(e, 15);
+        }
+    }
+
+    private void printUpdatedGame(Integer gameId) throws ResponseException {
+        var games = server.listGames(authToken.toString());
+        var updatedGame = games.games().stream().filter(game -> Objects.equals(game.gameID(), gameId)).findFirst();
+        if (updatedGame.isEmpty()) {
+            throw new ResponseException("game not found", 404);
+        }
+        ioManager.printGame(updatedGame.get());
     }
 
 }

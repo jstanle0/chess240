@@ -78,6 +78,15 @@ abstract public class IOHelpers {
         return new JoinGameBody(color, id);
     }
 
+    public Integer getObserveGameData() throws ResponseException {
+        if (cachedCommand != null && cachedCommand.length == 2) {
+            return getIntegerFromString(cachedCommand[1]);
+        }
+
+        System.out.print("Select game id: ");
+        return getIntegerFromString(scanner.nextLine());
+    }
+
     private ChessGame.TeamColor getColorFromString(String s) throws ResponseException {
         if (s.equalsIgnoreCase("white") || s.equalsIgnoreCase("w")) {
             return ChessGame.TeamColor.WHITE;
