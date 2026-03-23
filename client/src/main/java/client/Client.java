@@ -110,7 +110,7 @@ public class Client {
             server.joinGame(body, authToken.toString());
             System.out.println("Successfully joined game.");
             printUpdatedGame(body.gameID());
-            GamePrinter.printBoard(new ChessGame().getBoard(), body.playerColor());
+            new GameClient(server, authToken, scanner, body.playerColor()).run();
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 15);
         }
@@ -123,7 +123,7 @@ public class Client {
         try {
             var id = ioManager.getObserveGameData();
             printUpdatedGame(id);
-            GamePrinter.printBoard(new ChessGame().getBoard(), ChessGame.TeamColor.WHITE);
+            new GameClient(server, authToken, scanner, ChessGame.TeamColor.WHITE).run();
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 15);
         }

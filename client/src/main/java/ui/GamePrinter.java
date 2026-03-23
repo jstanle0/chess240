@@ -52,6 +52,7 @@ public class GamePrinter {
                 System.out.println(RESET_STYLING);
             }
         }
+        System.out.println();
     }
 
     private static void printCell(Integer r, Integer c, ChessBoard board) {
