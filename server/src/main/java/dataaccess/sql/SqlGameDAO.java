@@ -27,7 +27,7 @@ public class SqlGameDAO extends SqlHelpers implements GameDAO {
 
     @Override
     public GamesListResponse getGames() {
-        String query = "SELECT game_id, white_username, black_username, game_name FROM game";
+        String query = "SELECT game_id, white_username, black_username, game_name FROM game ORDER BY game_id";
         try {
             return new GamesListResponse(executeQuery(query, this::rsToGameData));
         } catch (SQLException e) {

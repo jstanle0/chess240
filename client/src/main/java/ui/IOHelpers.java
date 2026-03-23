@@ -33,9 +33,9 @@ abstract public class IOHelpers {
             return new LoginUserData(cachedCommand[1], cachedCommand[2]);
         }
 
-        System.out.println("Enter your username: ");
+        System.out.print("Enter your username: ");
         var username = scanner.nextLine();
-        System.out.println("Enter your password: ");
+        System.out.print("Enter your password: ");
         var password = scanner.nextLine();
 
         return new LoginUserData(username, password);
@@ -46,7 +46,7 @@ abstract public class IOHelpers {
             return new CreateGameBody(cachedCommand[1]);
         }
 
-        System.out.println("Enter the name of the game: ");
+        System.out.print("Enter the name of the game: ");
         return new CreateGameBody(scanner.nextLine());
     }
 
@@ -68,11 +68,11 @@ abstract public class IOHelpers {
 
     public JoinGameBody getJoinGameData() throws ResponseException {
         if (cachedCommand != null && cachedCommand.length == 3) {
-            return new JoinGameBody(getColorFromString(cachedCommand[2]), getIntegerFromString(cachedCommand[3]));
+            return new JoinGameBody(getColorFromString(cachedCommand[1]), getIntegerFromString(cachedCommand[2]));
         }
         System.out.print("Select team color: ");
         var color = getColorFromString(scanner.nextLine());
-        System.out.print("Select game id: ");
+        System.out.print("Select game number: ");
         var id = getIntegerFromString(scanner.nextLine());
 
         return new JoinGameBody(color, id);
@@ -83,7 +83,7 @@ abstract public class IOHelpers {
             return getIntegerFromString(cachedCommand[1]);
         }
 
-        System.out.print("Select game id: ");
+        System.out.print("Select game number: ");
         return getIntegerFromString(scanner.nextLine());
     }
 

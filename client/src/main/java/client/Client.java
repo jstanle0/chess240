@@ -6,9 +6,7 @@ import models.*;
 import ui.GamePrinter;
 import ui.IOManager;
 
-import java.util.Objects;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 public class Client {
     private final ServerFacade server;
@@ -87,7 +85,7 @@ public class Client {
         CreateGameBody body = ioManager.getCreateGameData();
         try {
             var gameData = server.createGame(body, authToken.toString());
-            System.out.println("Game " + gameData.gameName() + " has been created. The game id is " + gameData.gameID() + ".");
+            System.out.println("Game " + gameData.gameName() + " has been created. The game number is " + gameData.gameID() + ".");
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 13);
         }
@@ -96,18 +94,23 @@ public class Client {
     private void handleListGames() {
         try {
             var gameListData = server.listGames(authToken.toString());
-            ioManager.printGameList(gameListData);
+            var orderedGameList = new GamesListResponse(gameListData.games().stream().sorted(Comparator.comparingInt(GameData::gameID)).toList());
+            ioManager.printGameList(orderedGameList);
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 14);
         }
     }
 
+    /**
+     * Placeholder for websockets
+     */
     private void handleJoinGame() {
         try {
             var body = ioManager.getJoinGameData();
             server.joinGame(body, authToken.toString());
             System.out.println("Successfully joined game.");
             printUpdatedGame(body.gameID());
+            GamePrinter.printBoard(new ChessGame().getBoard(), body.playerColor());
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 15);
         }
