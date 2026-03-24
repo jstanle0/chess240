@@ -1,7 +1,6 @@
 package client;
 
 import chess.ChessGame;
-import com.mysql.cj.log.Log;
 import http.ServerFacade;
 import models.*;
 import org.junit.jupiter.api.*;
