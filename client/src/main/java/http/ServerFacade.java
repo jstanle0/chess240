@@ -15,6 +15,11 @@ public class ServerFacade {
 
     public ServerFacade(String url) { serverUrl = url; }
 
+    public void clearDB() throws ResponseException {
+        var req = createRequest("DELETE", "/db", null, null);
+        makeRequest(req, null);
+    }
+
     public AuthData createAccount(UserData body) throws ResponseException {
         var req = createRequest("POST", "/user", body, null);
         return makeRequest(req, AuthData.class);
