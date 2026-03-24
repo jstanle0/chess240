@@ -68,7 +68,7 @@ public class IOManager extends IOHelpers {
                 default -> 1;
             };
         }
-        return switch (command[0]) {
+        return switch (command[0].toLowerCase()) {
             case "2", "q", "quit" -> 2;
             case "3", "login" -> 3;
             case "4", "register" -> 4;
