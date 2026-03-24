@@ -3,7 +3,6 @@ package client;
 import chess.ChessGame;
 import http.ServerFacade;
 import models.*;
-import ui.GamePrinter;
 import ui.IOManager;
 
 import java.util.*;
@@ -13,6 +12,7 @@ public class Client {
     private UUID authToken;
     private final Scanner scanner = new Scanner(System.in);
     private final IOManager ioManager = new IOManager(scanner);
+    private List<GameData> cachedGames;
 
     public Client(String url) { server = new ServerFacade(url); }
 
@@ -85,7 +85,8 @@ public class Client {
         CreateGameBody body = ioManager.getCreateGameData();
         try {
             var gameData = server.createGame(body, authToken.toString());
-            System.out.println("Game " + gameData.gameName() + " has been created. The game number is " + gameData.gameID() + ".");
+            cachedGames = List.of(gameData);
+            System.out.println("Game " + gameData.gameName() + " has been created. Join it as game #1.");
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 13);
         }
@@ -94,8 +95,8 @@ public class Client {
     private void handleListGames() {
         try {
             var gameListData = server.listGames(authToken.toString());
-            var orderedGameList = new GamesListResponse(gameListData.games().stream().sorted(Comparator.comparingInt(GameData::gameID)).toList());
-            ioManager.printGameList(orderedGameList);
+            cachedGames = gameListData.games().stream().sorted(Comparator.comparingInt(GameData::gameID)).toList();
+            ioManager.printGameList(cachedGames);
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 14);
         }
@@ -106,7 +107,12 @@ public class Client {
      */
     private void handleJoinGame() {
         try {
-            var body = ioManager.getJoinGameData();
+            var colorAndNumber = ioManager.getJoinGameData();
+            if (cachedGames == null || colorAndNumber.gameID() < 1 || colorAndNumber.gameID() > cachedGames.size()) {
+                System.out.println("Game number is invalid. Please create a game or list games.");
+                return;
+            }
+            var body = new JoinGameBody(colorAndNumber.playerColor(), cachedGames.get(colorAndNumber.gameID() - 1).gameID());
             server.joinGame(body, authToken.toString());
             System.out.println("Successfully joined game.");
             printUpdatedGame(body.gameID());
@@ -121,7 +127,12 @@ public class Client {
      */
     private void handleObserveGame() {
         try {
-            var id = ioManager.getObserveGameData();
+            var number = ioManager.getObserveGameData();
+            if (cachedGames == null || number < 1 || number > cachedGames.size()) {
+                System.out.println("Game number is invalid. Please create a game or list games.");
+                return;
+            }
+            var id = cachedGames.get(number - 1).gameID();
             printUpdatedGame(id);
             new GameClient(server, authToken, scanner, ChessGame.TeamColor.WHITE).run();
         } catch (ResponseException e) {
@@ -131,11 +142,15 @@ public class Client {
 
     private void printUpdatedGame(Integer gameId) throws ResponseException {
         var games = server.listGames(authToken.toString());
-        var updatedGame = games.games().stream().filter(game -> Objects.equals(game.gameID(), gameId)).findFirst();
-        if (updatedGame.isEmpty()) {
-            throw new ResponseException("game not found", 404);
+        cachedGames = games.games().stream().sorted(Comparator.comparingInt(GameData::gameID)).toList();
+        for (int i = 0; i < cachedGames.size(); i++) {
+            var game = cachedGames.get(i);
+            if (Objects.equals(game.gameID(), gameId)) {
+                ioManager.printGame(game, i + 1);
+                return;
+            }
         }
-        ioManager.printGame(updatedGame.get());
+        throw new ResponseException("game not found", 404);
     }
 
 }

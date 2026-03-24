@@ -3,6 +3,7 @@ package ui;
 import chess.ChessGame;
 import models.*;
 
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -50,17 +51,17 @@ abstract public class IOHelpers {
         return new CreateGameBody(scanner.nextLine());
     }
 
-    public void printGameList(GamesListResponse gameList) {
-        if (gameList.games().isEmpty()) {
+    public void printGameList(List<GameData> gameList) {
+        if (gameList.isEmpty()) {
             System.out.println("There are not any active games right now.");
         }
-        for (var game : gameList.games()) {
-            printGame(game);
+        for (int i = 0; i < gameList.size(); i++) {
+            printGame(gameList.get(i), i + 1);
         }
     }
 
-    public void printGame(GameData game) {
-        System.out.println("Game #" + game.gameID() + ": " + game.gameName());
+    public void printGame(GameData game, Integer number) {
+        System.out.println("Game #" + number + ": " + game.gameName());
         System.out.println("White player: " + (game.whiteUsername() != null ? game.whiteUsername() : "OPEN"));
         System.out.println("Black player: " + (game.blackUsername() != null ? game.blackUsername() : "OPEN"));
         System.out.println();
