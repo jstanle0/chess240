@@ -10,7 +10,7 @@ import java.util.Map;
 import static ui.EscapeSequences.*;
 
 public class GamePrinter {
-    private static final Map<Integer, String> columnLetters = Map.of(
+    private static final Map<Integer, String> COLUMN_LETTERS = Map.of(
             0, "",
             1, "a",
             2, "b",
@@ -23,7 +23,7 @@ public class GamePrinter {
             9, ""
     );
 
-    private static final Map<ChessPiece.PieceType, String> abbreviatedPieceName = Map.of(
+    private static final Map<ChessPiece.PieceType, String> ABBREVIATED_PIECE_NAME = Map.of(
             ChessPiece.PieceType.PAWN, "P",
             ChessPiece.PieceType.ROOK, "R",
             ChessPiece.PieceType.KNIGHT, "N",
@@ -60,7 +60,7 @@ public class GamePrinter {
         if ((r == 0 || r == 9) && (c == 0 || c == 9)) {
             output += "   ";
         } else if (r == 0 || r == 9) {
-            output += " " + columnLetters.get(c) + " ";
+            output += " " + COLUMN_LETTERS.get(c) + " ";
         } else if (c == 0 || c == 9) {
             output += " " + r + " ";
         } else {
@@ -73,7 +73,7 @@ public class GamePrinter {
                 } else {
                     output += SET_TEXT_COLOR_BLUE;
                 }
-                output += " " + abbreviatedPieceName.get(piece.getPieceType()) + " ";
+                output += " " + ABBREVIATED_PIECE_NAME.get(piece.getPieceType()) + " ";
             }
         }
 

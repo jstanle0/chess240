@@ -17,9 +17,9 @@ public class ServerFacadeTests {
     @BeforeAll
     public static void init() {
         server = new Server();
-        var port = server.run(8080);
+        var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
-        serverFacade = new ServerFacade("http://localhost:8080");
+        serverFacade = new ServerFacade("http://localhost:" + port);
     }
     @BeforeEach
     public void clear() {
@@ -134,7 +134,10 @@ public class ServerFacadeTests {
     public void testJoinGame() {
         var authData = createTestAccount();
         var game1 = createTestGame(authData.authToken(), "game1");
-        Assertions.assertDoesNotThrow(() -> serverFacade.joinGame(new JoinGameBody(ChessGame.TeamColor.WHITE, game1.gameID()), authData.authToken().toString()));
+        Assertions.assertDoesNotThrow(() -> serverFacade.joinGame(
+                new JoinGameBody(ChessGame.TeamColor.WHITE, game1.gameID()),
+                authData.authToken().toString())
+        );
         var gameList = Assertions.assertDoesNotThrow(() -> serverFacade.listGames(authData.authToken().toString()));
         Assertions.assertEquals(authData.username(), gameList.games().stream().toList().getFirst().whiteUsername());
     }
@@ -143,8 +146,14 @@ public class ServerFacadeTests {
     public void testDuplicateJoinGame() {
         var authData = createTestAccount();
         var game1 = createTestGame(authData.authToken(), "game1");
-        Assertions.assertDoesNotThrow(() -> serverFacade.joinGame(new JoinGameBody(ChessGame.TeamColor.WHITE, game1.gameID()), authData.authToken().toString()));
-        var e = Assertions.assertThrows(ResponseException.class, () -> serverFacade.joinGame(new JoinGameBody(ChessGame.TeamColor.WHITE, game1.gameID()), authData.authToken().toString()));
+        Assertions.assertDoesNotThrow(() -> serverFacade.joinGame(
+                new JoinGameBody(ChessGame.TeamColor.WHITE, game1.gameID()),
+                authData.authToken().toString())
+        );
+        var e = Assertions.assertThrows(ResponseException.class, () -> serverFacade.joinGame(
+                new JoinGameBody(ChessGame.TeamColor.WHITE, game1.gameID()),
+                authData.authToken().toString())
+        );
         Assertions.assertEquals(403, e.getCode());
     }
 
