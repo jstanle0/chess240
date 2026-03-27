@@ -44,6 +44,14 @@ public class Server {
         javalin.get("/game", new GetGamesHandler());
         javalin.post("/game", new CreateGameHandler());
         javalin.put("/game", new JoinGameHandler());
+
+        // Websocket
+        var webSocketHandler = new WebSocketHandler();
+        javalin.ws("/ws", ws -> {
+           ws.onConnect(webSocketHandler);
+           ws.onMessage(webSocketHandler);
+           ws.onClose(webSocketHandler);
+        });
     }
 
     private void createExceptionHandlers(Javalin javalin) {

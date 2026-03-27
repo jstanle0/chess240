@@ -126,6 +126,13 @@ public class ChessGame extends GameHelpers {
         return board;
     }
 
+    /**
+     * Sets turn to null. If turn is null, no actions can be taken.
+     */
+    public void disableGame() {
+        turn = null;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(turn, board.toString());
