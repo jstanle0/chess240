@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.*;
 import models.GameData;
@@ -33,20 +34,13 @@ public class WebSocketService {
     }
 
     private static void handleConnection(UserGameCommand command, Session session) {
-        String connectingUser;
-        ChessGame game;
-
-        try {
-            connectingUser = authDAO.getUsernameFromToken(UUID.fromString(command.getAuthToken()));
-        } catch (DataAccessException | IllegalArgumentException e) {
-            sendError(session, "you are not logged in.");
+        var connectingUser = authenticateUser(command, session);
+        if (connectingUser == null) {
             return;
         }
 
-        try {
-            game = gameDAO.getGameObject(command.getGameID());
-        } catch (DataAccessException e) {
-            sendError(session, "invalid game id");
+        var game = getGame(command, session);
+        if (game == null) {
             return;
         }
 
@@ -71,25 +65,74 @@ public class WebSocketService {
     }
 
     private static void handleMove(UserGameCommand command, Session session) {
+        var username = authenticateUser(command, session);
+        if (username == null) {
+            return;
+        }
 
+        var game = safeGetGame(command, session);
+        if (game == null) {
+            return;
+        }
+
+        var gameData = getGameData(command, session);
+        if (gameData == null) {
+            return;
+        }
+
+        var teamColor = getTeamColor(gameData, username, session);
+        if (teamColor == null) {
+            return;
+        }
+
+        if (game.getTeamTurn() != teamColor) {
+            sendError(session, "It isn't your turn");
+            return;
+        }
+
+        var pieceToMove = game.getBoard().getPiece(command.getMove().getStartPosition());
+        if (pieceToMove.getTeamColor() != teamColor) {
+            sendError(session, "You cannot move this piece.");
+            return;
+        }
+
+        try {
+            game.makeMove(command.getMove());
+        } catch (InvalidMoveException e) {
+            sendError(session, "This move is invalid.");
+            return;
+        }
+
+        if (game.isInCheckmate((teamColor == ChessGame.TeamColor.WHITE) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE )) {
+            game.disableGame();
+        }
+
+        gameDAO.updateGameObject(command.getGameID(), game);
+
+        var sessionList = connectionMap.get(command.getGameID());
+        var message = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        sendNotifications(sessionList, message);
+        sendNotificationsToOthers(
+                sessionList,
+                new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, username + " has made a move."),
+                session
+                );
+        if (game.isDisabled()) {
+            sendNotifications(sessionList, new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, username + " has won the game!"));
+        }
     }
 
     private static void handleLeave(UserGameCommand command, Session session) {
-        String username;
-        try {
-            username = authDAO.getUsernameFromToken(UUID.fromString(command.getAuthToken()));
-        } catch (DataAccessException e) {
-            sendError(session, "Login is invalid.");
+        var username = authenticateUser(command, session);
+        if (username == null) {
             return;
         }
 
-        GameData gameData;
-        try {
-            gameData = gameDAO.getGame(command.getGameID());
-        } catch (DataAccessException e) {
-            sendError(session, "Invalid game id");
+        var gameData = getGameData(command, session);
+        if (gameData == null) {
             return;
         }
+
         if (Objects.equals(gameData.whiteUsername(), username)) {
             gameDAO.updateGame(new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.gameName()));
         } else if (Objects.equals(gameData.blackUsername(), username)) {
@@ -104,11 +147,100 @@ public class WebSocketService {
     }
 
     private static void handleResign(UserGameCommand command, Session session) {
+        var username = authenticateUser(command, session);
+        if (username == null) {
+            return;
+        }
 
+        var gameData = getGameData(command, session);
+        if (gameData == null) {
+            return;
+        }
+
+        var game = safeGetGame(command, session);
+        if (game == null) {
+            return;
+        }
+
+        var teamColor = getTeamColor(gameData, username, session);
+        if (teamColor == null) {
+            return;
+        }
+
+        var otherUsername = (teamColor == ChessGame.TeamColor.WHITE) ? gameData.blackUsername() : gameData.whiteUsername();
+
+        game.disableGame();
+        gameDAO.updateGameObject(command.getGameID(), game);
+
+        var sessionList = connectionMap.get(command.getGameID());
+        sendNotifications(sessionList, new ServerMessage(
+                ServerMessage.ServerMessageType.NOTIFICATION,
+                username + " has resigned. " + otherUsername + " has won the game!")
+        );
+    }
+
+    private static ChessGame safeGetGame(UserGameCommand command, Session session) {
+        var game = getGame(command, session);
+        if (game == null) {
+            return null;
+        }
+
+        if (game.isDisabled()) {
+            sendError(session, "This game is no longer active");
+            return null;
+        }
+
+        return game;
+    }
+
+    private static ChessGame.TeamColor getTeamColor(GameData gameData, String username, Session session) {
+        if (Objects.equals(gameData.whiteUsername(), username)) {
+            return ChessGame.TeamColor.WHITE;
+        } else if (Objects.equals(gameData.blackUsername(), username)) {
+            return ChessGame.TeamColor.BLACK;
+        } else {
+            sendError(session, "Observers are unable to move pieces.");
+            return null;
+        }
+    }
+
+    private static String authenticateUser(UserGameCommand command, Session session) {
+        try {
+            return authDAO.getUsernameFromToken(UUID.fromString(command.getAuthToken()));
+        } catch (DataAccessException | IllegalArgumentException e) {
+            sendError(session, "Login is invalid.");
+            return null;
+        }
+    }
+
+    private static ChessGame getGame(UserGameCommand command, Session session) {
+        try {
+            return gameDAO.getGameObject(command.getGameID());
+        } catch (DataAccessException e) {
+            sendError(session, "invalid game id");
+            return null;
+        }
+    }
+
+    private static GameData getGameData(UserGameCommand command, Session session) {
+        try {
+            return gameDAO.getGame(command.getGameID());
+        } catch (DataAccessException e) {
+            sendError(session, "Invalid game id");
+            return null;
+        }
     }
 
     private static void sendNotifications(HashSet<Session> connections, ServerMessage message) {
         connections.forEach((s) -> {
+            sendNotification(s, message);
+        });
+    }
+    private static void sendNotificationsToOthers(HashSet<Session> connections, ServerMessage message, Session currentSession) {
+        connections.forEach((s) -> {
+            if (s == currentSession) {
+                return;
+            }
             sendNotification(s, message);
         });
     }

@@ -133,6 +133,8 @@ public class ChessGame extends GameHelpers {
         turn = null;
     }
 
+    public boolean isDisabled() { return turn == null; }
+
     @Override
     public int hashCode() {
         return Objects.hash(turn, board.toString());
