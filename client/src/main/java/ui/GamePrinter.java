@@ -1,17 +1,15 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 import static ui.EscapeSequences.*;
 
 public class GamePrinter {
     private static final Map<Integer, String> COLUMN_LETTERS = Map.of(
-            0, "",
             1, "a",
             2, "b",
             3, "c",
@@ -19,8 +17,7 @@ public class GamePrinter {
             5, "e",
             6, "f",
             7, "g",
-            8, "h",
-            9, ""
+            8, "h"
     );
 
     private static final Map<ChessPiece.PieceType, String> ABBREVIATED_PIECE_NAME = Map.of(
@@ -33,13 +30,18 @@ public class GamePrinter {
     );
 
 
-    public static void printBoard(ChessBoard board, ChessGame.TeamColor color) {
+    public static void printBoard(ChessBoard board, ChessGame.TeamColor color, Collection<ChessMove> highlightedMoves) {
         //10 rows, 10 columns - 8 of the game, 2 labels on all sides
         if (color == ChessGame.TeamColor.WHITE) {
             for (int i = 9; i >= 0; i--) {
                 System.out.print(SET_TEXT_BOLD);
                 for (int j = 0; j < 10; j++) {
-                    printCell(i, j, board);
+                    int finalI = i;
+                    int finalJ = j;
+                    var highlighted = highlightedMoves.stream().anyMatch((move) ->
+                            Objects.equals(move.getEndPosition(), new ChessPosition(finalI, finalJ)
+                    ));
+                    printCell(i, j, board, highlighted);
                 }
                 System.out.println(RESET_STYLING);
             }
@@ -47,7 +49,12 @@ public class GamePrinter {
             for (int i = 0; i < 10; i++) {
                 System.out.print(SET_TEXT_BOLD);
                 for (int j = 9; j >= 0; j--) {
-                    printCell(i, j, board);
+                    int finalI = i;
+                    int finalJ = j;
+                    var highlighted = highlightedMoves.stream().anyMatch((move) ->
+                            Objects.equals(move.getEndPosition(), new ChessPosition(finalI, finalJ)
+                            ));
+                    printCell(i, j, board, highlighted);
                 }
                 System.out.println(RESET_STYLING);
             }
@@ -55,8 +62,8 @@ public class GamePrinter {
         System.out.println();
     }
 
-    private static void printCell(Integer r, Integer c, ChessBoard board) {
-        String output = addBackgroundColor("", r, c);
+    private static void printCell(Integer r, Integer c, ChessBoard board, boolean highlighted) {
+        String output = addBackgroundColor("", r, c, highlighted);
         if ((r == 0 || r == 9) && (c == 0 || c == 9)) {
             output += "   ";
         } else if (r == 0 || r == 9) {
@@ -80,7 +87,11 @@ public class GamePrinter {
         System.out.print(output);
     }
 
-    private static String addBackgroundColor(String output, Integer r, Integer c) {
+    private static String addBackgroundColor(String output, Integer r, Integer c, boolean highlighted) {
+        if (highlighted) {
+            output += SET_BG_COLOR_GREEN;
+            return output;
+        }
         if (r == 0 || r == 9 || c == 0 || c == 9) {
             output += SET_BG_COLOR_LIGHT_GREY;
             output += SET_TEXT_COLOR_BLACK;

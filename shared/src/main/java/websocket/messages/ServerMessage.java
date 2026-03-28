@@ -40,6 +40,7 @@ public class ServerMessage {
     }
     public String getMessage() { return message; }
     public ChessGame getGame() { return game; }
+    public String getErrorMessage() { return  errorMessage; }
 
     @Override
     public boolean equals(Object o) {

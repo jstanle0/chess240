@@ -15,6 +15,8 @@ public class ServerFacade {
 
     public ServerFacade(String url) { serverUrl = url; }
 
+    public String getServerUrl() { return serverUrl; }
+
     public void clearDB() throws ResponseException {
         var req = createRequest("DELETE", "/db", null, null);
         makeRequest(req, null);

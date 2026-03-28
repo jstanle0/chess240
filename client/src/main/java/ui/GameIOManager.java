@@ -1,10 +1,27 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
+import models.ResponseException;
+import websocket.messages.ServerMessage;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Scanner;
 
 public class GameIOManager {
+    private static final Map<String, Integer> COLUMN_LETTERS = Map.of(
+            "a", 1,
+            "b", 2,
+            "c", 3,
+            "d", 4,
+            "e", 5,
+            "f", 6,
+            "g", 7,
+            "h", 8
+    );
+
     private final Scanner scanner;
     private String[] cachedCommand;
 
@@ -40,7 +57,49 @@ public class GameIOManager {
         };
     }
 
-    public void printGame(ChessGame game, ChessGame.TeamColor team) {
-        GamePrinter.printBoard(game.getBoard(), team);
+    public void printMessage(ServerMessage message) {
+        System.out.println(message.getMessage());
+    }
+
+    public void printError(ServerMessage message) {
+        System.out.println(message.getErrorMessage());
+    }
+
+    public void printGameMessage(ServerMessage message, ChessGame.TeamColor team) {
+        printGame(message.getGame(), team, null);
+    }
+
+    public void printGame(ChessGame game, ChessGame.TeamColor team, ChessPosition highlightedPiece) {
+        Collection<ChessMove> highlightedMoves = null;
+        if (highlightedPiece != null) {
+            highlightedMoves = game.validMoves(highlightedPiece);
+        }
+        GamePrinter.printBoard(game.getBoard(), team, highlightedMoves);
+    }
+
+    public ChessPosition getPosition() throws ResponseException {
+        if (cachedCommand != null && cachedCommand.length > 2) {
+            return parsePosition(cachedCommand[1]);
+        }
+        System.out.print("Enter the piece (format \"a1\"): ");
+        var stringPosition = scanner.nextLine();
+        return parsePosition(stringPosition);
+    }
+
+    private ChessPosition parsePosition(String s) throws ResponseException {
+        if (s.length() != 2) {
+            throw new ResponseException("Invalid piece position format.", 400);
+        }
+        var r = s.charAt(1) - '0';
+        if (r < 1 || r > 8) {
+            throw new ResponseException("Row is invalid", 400);
+        }
+
+        var c = COLUMN_LETTERS.get(String.valueOf(s.charAt(1)).toLowerCase());
+        if (c == null || c < 1 || c > 8) {
+            throw new ResponseException("Column is invalid", 400);
+        }
+
+        return new ChessPosition(r, c);
     }
 }

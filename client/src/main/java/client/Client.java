@@ -112,11 +112,12 @@ public class Client {
                 System.out.println("Game number is invalid. Please create a game or list games.");
                 return;
             }
-            var body = new JoinGameBody(colorAndNumber.playerColor(), cachedGames.get(colorAndNumber.gameID() - 1).gameID());
+            var gameId = cachedGames.get(colorAndNumber.gameID() - 1).gameID();
+            var body = new JoinGameBody(colorAndNumber.playerColor(), gameId);
             server.joinGame(body, authToken.toString());
             System.out.println("Successfully joined game.");
             printUpdatedGame(body.gameID());
-            new GameClient(server, authToken, scanner, body.playerColor()).run();
+            new GameClient(server, authToken, scanner, body.playerColor(), gameId).run();
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 15);
         }
@@ -134,7 +135,7 @@ public class Client {
             }
             var id = cachedGames.get(number - 1).gameID();
             printUpdatedGame(id);
-            new GameClient(server, authToken, scanner, ChessGame.TeamColor.WHITE).run();
+            new GameClient(server, authToken, scanner, ChessGame.TeamColor.WHITE, id).run();
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 15);
         }
