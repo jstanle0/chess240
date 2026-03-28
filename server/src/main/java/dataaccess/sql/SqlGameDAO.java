@@ -2,6 +2,7 @@ package dataaccess.sql;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import models.GameData;
@@ -100,8 +101,9 @@ public class SqlGameDAO extends SqlHelpers implements GameDAO {
     public void updateGameObject(Integer gameId, ChessGame newObject) {
         String statement = "UPDATE game SET game = ? WHERE game_id = ?";
         try {
-            var gson = new Gson();
-            executeUpdate(statement, gson.toJson(newObject), gameId);
+            var gson = new GsonBuilder().serializeNulls().create();
+            var newJson = gson.toJson(newObject);
+            executeUpdate(statement, newJson, gameId);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to update game: " + e);
         }

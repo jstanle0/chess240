@@ -3,6 +3,7 @@ package service;
 import chess.ChessGame;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import dataaccess.*;
 import models.GameData;
 import org.eclipse.jetty.websocket.api.Session;
@@ -157,7 +158,7 @@ public class WebSocketService {
             return;
         }
 
-        var game = safeGetGame(command, session);
+        ChessGame game = safeGetGame(command, session);
         if (game == null) {
             return;
         }
