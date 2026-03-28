@@ -22,7 +22,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
     public void handleMessage(@NotNull WsMessageContext wsMessageContext) throws RuntimeException {
         try {
             UserGameCommand command = new Gson().fromJson(wsMessageContext.message(), UserGameCommand.class);
-            WebSocketService.handleCommand(command);
+            WebSocketService.handleCommand(command, wsMessageContext.session);
         } catch (Exception e) {
             e.printStackTrace();
         }
