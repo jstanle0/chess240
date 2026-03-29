@@ -143,7 +143,7 @@ public class WebSocketService {
         connectionList.remove(session);
         sendNotifications(connectionList, new ServerMessage(
                 ServerMessage.ServerMessageType.NOTIFICATION,
-                "%s has left the game."
+                String.format("%s has left the game.", username)
         ));
     }
 

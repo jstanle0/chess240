@@ -30,7 +30,7 @@ public class IOManager extends IOHelpers {
 
     public void printHelp(Boolean isLoggedIn) {
         if (isLoggedIn) {
-            System.out.println("""
+            System.out.print("""
                     Instructions:
                     "1": Display help information
                     "2": Logout
