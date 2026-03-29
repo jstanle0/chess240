@@ -36,12 +36,7 @@ public class GamePrinter {
             for (int i = 9; i >= 0; i--) {
                 System.out.print(SET_TEXT_BOLD);
                 for (int j = 0; j < 10; j++) {
-                    int finalI = i;
-                    int finalJ = j;
-                    var highlighted = highlightedMoves.stream().anyMatch((move) ->
-                            Objects.equals(move.getEndPosition(), new ChessPosition(finalI, finalJ)
-                    ));
-                    printCell(i, j, board, highlighted);
+                    generateCell(board, highlightedMoves, i, j);
                 }
                 System.out.println(RESET_STYLING);
             }
@@ -49,17 +44,22 @@ public class GamePrinter {
             for (int i = 0; i < 10; i++) {
                 System.out.print(SET_TEXT_BOLD);
                 for (int j = 9; j >= 0; j--) {
-                    int finalI = i;
-                    int finalJ = j;
-                    var highlighted = highlightedMoves.stream().anyMatch((move) ->
-                            Objects.equals(move.getEndPosition(), new ChessPosition(finalI, finalJ)
-                            ));
-                    printCell(i, j, board, highlighted);
+                    generateCell(board, highlightedMoves, i, j);
                 }
                 System.out.println(RESET_STYLING);
             }
         }
         System.out.println();
+    }
+
+    private static void generateCell(ChessBoard board, Collection<ChessMove> highlightedMoves, int i, int j) {
+        boolean highlighted = false;
+        if (highlightedMoves != null) {
+            highlighted = highlightedMoves.stream().anyMatch((move) ->
+                    Objects.equals(move.getEndPosition(), new ChessPosition(i, j)
+                    ));
+        }
+        printCell(i, j, board, highlighted);
     }
 
     private static void printCell(Integer r, Integer c, ChessBoard board, boolean highlighted) {

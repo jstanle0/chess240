@@ -117,7 +117,7 @@ public class Client {
             server.joinGame(body, authToken.toString());
             System.out.println("Successfully joined game.");
             printUpdatedGame(body.gameID());
-            new GameClient(server, authToken, scanner, body.playerColor(), gameId).run();
+            new GameClient(server, authToken, scanner, body.playerColor(), gameId, false).run();
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 15);
         }
@@ -135,7 +135,7 @@ public class Client {
             }
             var id = cachedGames.get(number - 1).gameID();
             printUpdatedGame(id);
-            new GameClient(server, authToken, scanner, ChessGame.TeamColor.WHITE, id).run();
+            new GameClient(server, authToken, scanner, ChessGame.TeamColor.WHITE, id, true).run();
         } catch (ResponseException e) {
             ioManager.printResponseError(e, 15);
         }

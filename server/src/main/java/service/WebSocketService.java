@@ -246,6 +246,7 @@ public class WebSocketService {
         });
     }
     private static void sendNotification(Session s, ServerMessage message) {
+        System.out.println("sending notification");
         if (s.isOpen()) {
             try {
                 s.getRemote().sendString(gson.toJson(message));

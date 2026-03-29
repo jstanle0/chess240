@@ -21,6 +21,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
     @Override
     public void handleMessage(@NotNull WsMessageContext wsMessageContext) throws RuntimeException {
         try {
+            System.out.println("Message received");
             UserGameCommand command = new Gson().fromJson(wsMessageContext.message(), UserGameCommand.class);
             WebSocketService.handleCommand(command, wsMessageContext.session);
         } catch (Exception e) {

@@ -2,6 +2,7 @@ package ui;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import models.ResponseException;
 import websocket.messages.ServerMessage;
@@ -29,14 +30,19 @@ public class GameIOManager {
         scanner = s;
     }
 
-    public void printHelp() {
+    public void printHelp(boolean isObserver) {
         System.out.println("""
                     Instructions:
                     "1": Display help information
                     "2": Leave game
                     "3": Redraw chess board
-                    "4": Make move
-                    "5": Highlight legal moves
+                    "4": Highlight legal moves
+                    """);
+        if (isObserver) {
+            return;
+        }
+        System.out.println("""
+                    "5": Make move
                     "6": Resign game
                     """);
     }
@@ -78,12 +84,35 @@ public class GameIOManager {
     }
 
     public ChessPosition getPosition() throws ResponseException {
-        if (cachedCommand != null && cachedCommand.length > 2) {
+        if (cachedCommand != null && cachedCommand.length == 2) {
             return parsePosition(cachedCommand[1]);
         }
         System.out.print("Enter the piece (format \"a1\"): ");
         var stringPosition = scanner.nextLine();
         return parsePosition(stringPosition);
+    }
+
+    public ChessMove getMove() throws ResponseException {
+        if (cachedCommand != null) {
+            if (cachedCommand.length == 3) {
+                return new ChessMove(parsePosition(cachedCommand[1]), parsePosition(cachedCommand[2]), null);
+            } else if (cachedCommand.length == 4) {
+                return new ChessMove(parsePosition(cachedCommand[1]), parsePosition(cachedCommand[2]), ChessPiece.PieceType.valueOf(cachedCommand[3].toUpperCase()));
+            }
+        }
+
+        System.out.print("Enter the start position (format \"a1\"): ");
+        var startPos = parsePosition(scanner.nextLine());
+        System.out.print("Enter the end position (format \"a1\"): ");
+        var endPos = parsePosition(scanner.nextLine());
+        System.out.print("Enter piece to promote to (nothing if not applicable): ");
+        ChessPiece.PieceType type;
+        try {
+            type = ChessPiece.PieceType.valueOf(scanner.nextLine().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            type = null;
+        }
+        return new ChessMove(startPos, endPos, type);
     }
 
     private ChessPosition parsePosition(String s) throws ResponseException {
@@ -95,7 +124,7 @@ public class GameIOManager {
             throw new ResponseException("Row is invalid", 400);
         }
 
-        var c = COLUMN_LETTERS.get(String.valueOf(s.charAt(1)).toLowerCase());
+        var c = COLUMN_LETTERS.get(String.valueOf(s.charAt(0)).toLowerCase());
         if (c == null || c < 1 || c > 8) {
             throw new ResponseException("Column is invalid", 400);
         }

@@ -23,24 +23,28 @@ public class GameClient {
     private ChessGame game;
     private final Integer gameId;
     private final ChessGame.TeamColor team;
+    private final boolean isObserver;
 
-    public GameClient(ServerFacade s, UUID a, Scanner sc, ChessGame.TeamColor c, Integer id) throws ResponseException {
+    public GameClient(ServerFacade s, UUID a, Scanner sc, ChessGame.TeamColor c, Integer id, boolean isObs) throws ResponseException {
         server = s;
         authToken = a;
         ioManager = new GameIOManager(sc);
         team = c;
         gameId = id;
+        isObserver = isObs;
         var notificationHandler = new NotificationHandler() {
             @Override
             public void handleMessage(ServerMessage message) {
+                System.out.println("received message");
                 processMessage(message);
             }
         };
         ws = new WebSocketFacade(server.getServerUrl(), notificationHandler);
+        ws.connect(gameId, authToken.toString());
     }
 
     public void run() {
-        ioManager.printHelp();
+        ioManager.printHelp(isObserver);
 
         while (true) {
             try {
@@ -69,7 +73,9 @@ public class GameClient {
             case 2 -> handleLeave();
             case 3 -> ioManager.printGame(game, team, null);
             case 4 -> handleHighlight();
-            default -> ioManager.printHelp();
+            case 5 -> handleMakeMove();
+            case 6 -> handleResignGame();
+            default -> ioManager.printHelp(isObserver);
         }
     }
 
@@ -82,9 +88,35 @@ public class GameClient {
         }
     }
 
-    private void handleLeave() {
+    private void handleLeave() throws ExitException {
         try {
             ws.leave(gameId, authToken.toString());
+        } catch (ResponseException e) {
+            ioManager.printError(new ServerMessage(ServerMessage.ServerMessageType.ERROR, e.getMessage()));
+        }
+        throw new ExitException();
+    }
+
+    private void handleMakeMove() {
+        if (isObserver) {
+            ioManager.printHelp(true);
+            return;
+        }
+        try {
+            var move = ioManager.getMove();
+            ws.makeMove(gameId, authToken.toString(), move);
+        } catch (ResponseException e) {
+            ioManager.printError(new ServerMessage(ServerMessage.ServerMessageType.ERROR, e.getMessage()));
+        }
+    }
+
+    private void handleResignGame() {
+        if (isObserver) {
+            ioManager.printHelp(true);
+            return;
+        }
+        try {
+            ws.resign(gameId, authToken.toString());
         } catch (ResponseException e) {
             ioManager.printError(new ServerMessage(ServerMessage.ServerMessageType.ERROR, e.getMessage()));
         }
