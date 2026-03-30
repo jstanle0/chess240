@@ -3,7 +3,6 @@ package service;
 import chess.ChessGame;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import dataaccess.*;
 import models.GameData;
 import org.eclipse.jetty.websocket.api.Session;
@@ -44,6 +43,19 @@ public class WebSocketService {
             return;
         }
 
+        var gameData = getGameData(command, session);
+        String joinRole;
+        if (gameData != null) {
+            var color = getTeamColor(gameData, connectingUser);
+            joinRole = switch (color) {
+                case BLACK -> "black";
+                case WHITE -> "white";
+                case null -> "an observer";
+            };
+        } else {
+            joinRole = "an observer";
+        }
+
         var loadGameMessage = new ServerMessage(
                 ServerMessage.ServerMessageType.LOAD_GAME,
                 game
@@ -62,12 +74,17 @@ public class WebSocketService {
 
         var message = new ServerMessage(
                 ServerMessage.ServerMessageType.NOTIFICATION,
-                String.format("%s joined the game.", connectingUser));
+                String.format("%s joined the game as %s.", connectingUser, joinRole));
         sendNotifications(connectionList, message);
 
         connectionList.add(session);
     }
 
+    private enum GameNotificationState {
+        CHECKMATE,
+        STALEMATE,
+        CHECK
+    }
     private static void handleMove(UserGameCommand command, Session session) {
         var username = authenticateUser(command, session);
         if (username == null) {
@@ -84,8 +101,9 @@ public class WebSocketService {
             return;
         }
 
-        var teamColor = getTeamColor(gameData, username, session);
+        var teamColor = getTeamColor(gameData, username);
         if (teamColor == null) {
+            sendError(session, "Observers are unable to move pieces.");
             return;
         }
 
@@ -95,6 +113,10 @@ public class WebSocketService {
         }
 
         var pieceToMove = game.getBoard().getPiece(command.getMove().getStartPosition());
+        if (pieceToMove == null) {
+            sendError(session, "There isn't a piece at this position.");
+            return;
+        }
         if (pieceToMove.getTeamColor() != teamColor) {
             sendError(session, "You cannot move this piece.");
             return;
@@ -107,8 +129,18 @@ public class WebSocketService {
             return;
         }
 
-        if (game.isInCheckmate((teamColor == ChessGame.TeamColor.WHITE) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE )) {
+        GameNotificationState notificationState = null;
+        var otherTeamColor = (teamColor == ChessGame.TeamColor.WHITE) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+        var otherUsername = (otherTeamColor == ChessGame.TeamColor.WHITE) ? gameData.whiteUsername() : gameData.blackUsername();
+
+        if (game.isInCheckmate(otherTeamColor)) {
             game.disableGame();
+            notificationState = GameNotificationState.CHECKMATE;
+        } else if (game.isInStalemate(otherTeamColor)) {
+            game.disableGame();
+            notificationState = GameNotificationState.STALEMATE;
+        } else if (game.isInCheck(otherTeamColor)) {
+            notificationState = GameNotificationState.CHECK;
         }
 
         gameDAO.updateGameObject(command.getGameID(), game);
@@ -121,8 +153,20 @@ public class WebSocketService {
                 new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, username + " has made a move."),
                 session
                 );
-        if (game.isDisabled()) {
-            sendNotifications(sessionList, new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, username + " has won the game!"));
+        if (notificationState != null) {
+            var notification = switch (notificationState) {
+                case CHECKMATE -> new ServerMessage(
+                            ServerMessage.ServerMessageType.NOTIFICATION,
+                            otherUsername + " is in checkmate. " + username + " has won the game!");
+                case STALEMATE -> new ServerMessage(
+                            ServerMessage.ServerMessageType.NOTIFICATION,
+                            "The game has ended in a stalemate.");
+                case CHECK -> new ServerMessage(
+                        ServerMessage.ServerMessageType.NOTIFICATION,
+                        otherUsername + " is in check."
+                );
+            };
+            sendNotifications(sessionList, notification);
         }
     }
 
@@ -166,8 +210,9 @@ public class WebSocketService {
             return;
         }
 
-        var teamColor = getTeamColor(gameData, username, session);
+        var teamColor = getTeamColor(gameData, username);
         if (teamColor == null) {
+            sendError(session, "Observers are unable to resign.");
             return;
         }
 
@@ -197,13 +242,12 @@ public class WebSocketService {
         return game;
     }
 
-    private static ChessGame.TeamColor getTeamColor(GameData gameData, String username, Session session) {
+    private static ChessGame.TeamColor getTeamColor(GameData gameData, String username) {
         if (Objects.equals(gameData.whiteUsername(), username)) {
             return ChessGame.TeamColor.WHITE;
         } else if (Objects.equals(gameData.blackUsername(), username)) {
             return ChessGame.TeamColor.BLACK;
         } else {
-            sendError(session, "Observers are unable to move pieces.");
             return null;
         }
     }

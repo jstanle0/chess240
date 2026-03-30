@@ -115,6 +115,7 @@ public class GameClient {
             return;
         }
         try {
+            ioManager.verifyResign();
             ws.resign(gameId, authToken.toString());
         } catch (ResponseException e) {
             ioManager.printError(new ServerMessage(ServerMessage.ServerMessageType.ERROR, e.getMessage()));

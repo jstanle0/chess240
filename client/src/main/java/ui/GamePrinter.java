@@ -88,18 +88,22 @@ public class GamePrinter {
     }
 
     private static String addBackgroundColor(String output, Integer r, Integer c, boolean highlighted) {
-        if (highlighted) {
-            output += SET_BG_COLOR_GREEN;
-            return output;
-        }
         if (r == 0 || r == 9 || c == 0 || c == 9) {
             output += SET_BG_COLOR_LIGHT_GREY;
             output += SET_TEXT_COLOR_BLACK;
         } else {
             if ((r + c) % 2 == 0) {
-                output += SET_BG_COLOR_BLACK;
+                if (highlighted) {
+                    output += SET_BG_COLOR_DARK_GREEN;
+                } else {
+                    output += SET_BG_COLOR_BLACK;
+                }
             } else {
-                output += SET_BG_COLOR_WHITE;
+                if (highlighted) {
+                    output += SET_BG_COLOR_GREEN;
+                } else {
+                    output += SET_BG_COLOR_WHITE;
+                }
             }
         }
         return output;

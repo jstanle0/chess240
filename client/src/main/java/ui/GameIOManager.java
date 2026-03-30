@@ -89,6 +89,14 @@ public class GameIOManager {
         GamePrinter.printBoard(game.getBoard(), team, highlightedMoves);
     }
 
+    public void verifyResign() throws ResponseException {
+        System.out.print("Are you sure you want to resign? (y/n)");
+        var confirmation = scanner.nextLine();
+        if (!confirmation.equalsIgnoreCase("y")) {
+            throw new ResponseException("Resignation cancelled.", 400);
+        }
+    }
+
     public ChessPosition getPosition() throws ResponseException {
         if (cachedCommand != null && cachedCommand.length == 2) {
             return parsePosition(cachedCommand[1]);
