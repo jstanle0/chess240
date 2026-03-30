@@ -18,7 +18,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WebSocketService {
-    private static final UserDAO userDAO = DAOs.getUserDAO();
     private static final AuthDAO authDAO = DAOs.getAuthDAO();
     private static final GameDAO gameDAO = DAOs.getGameDAO();
     private static final Gson gson = new Gson();
@@ -50,6 +49,10 @@ public class WebSocketService {
                 game
             );
         sendNotification(session, loadGameMessage);
+
+        if (game.isDisabled()) {
+            sendNotification(session, new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "This game has ended."));
+        }
 
         var connectionList = connectionMap.get(command.getGameID());
         if (connectionList == null) {
@@ -246,7 +249,6 @@ public class WebSocketService {
         });
     }
     private static void sendNotification(Session s, ServerMessage message) {
-        System.out.println("sending notification");
         if (s.isOpen()) {
             try {
                 s.getRemote().sendString(gson.toJson(message));

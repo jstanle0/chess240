@@ -35,7 +35,6 @@ public class GameClient {
         var notificationHandler = new NotificationHandler() {
             @Override
             public void handleMessage(ServerMessage message) {
-                System.out.println("received message");
                 processMessage(message);
             }
         };

@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Scanner;
 
+import static ui.EscapeSequences.*;
+
 public class GameIOManager {
     private static final Map<String, Integer> COLUMN_LETTERS = Map.of(
             "a", 1,
@@ -31,7 +33,7 @@ public class GameIOManager {
     }
 
     public void printHelp(boolean isObserver) {
-        System.out.println("""
+        System.out.print("""
                     Instructions:
                     "1": Display help information
                     "2": Leave game
@@ -39,6 +41,7 @@ public class GameIOManager {
                     "4": Highlight legal moves
                     """);
         if (isObserver) {
+            System.out.println();
             return;
         }
         System.out.println("""
@@ -49,7 +52,6 @@ public class GameIOManager {
 
     public Integer getCommandCode() {
         cachedCommand = null;
-        System.out.print(IOManager.PROMPT);
         var command = scanner.nextLine().split("\\s+");
         if (command.length > 1) {
             cachedCommand = command;
@@ -57,18 +59,19 @@ public class GameIOManager {
         return switch (command[0].toLowerCase()) {
             case "2", "leave", "quit" -> 2;
             case "3", "redraw" -> 3;
-            case "4", "move" -> 4;
-            case "5", "highlight" -> 5;
+            case "4", "highlight" -> 4;
+            case "5", "move" -> 5;
+            case "6", "resign" -> 6;
             default -> 1;
         };
     }
 
     public void printMessage(ServerMessage message) {
-        System.out.println(message.getMessage());
+        System.out.println(SET_TEXT_COLOR_GREEN + message.getMessage() + RESET_TEXT_COLOR);
     }
 
     public void printError(ServerMessage message) {
-        System.out.println(message.getErrorMessage());
+        System.out.println(SET_TEXT_COLOR_RED + message.getErrorMessage() + RESET_TEXT_COLOR);
     }
 
     public void printGameMessage(ServerMessage message, ChessGame.TeamColor team) {
@@ -78,7 +81,10 @@ public class GameIOManager {
     public void printGame(ChessGame game, ChessGame.TeamColor team, ChessPosition highlightedPiece) {
         Collection<ChessMove> highlightedMoves = null;
         if (highlightedPiece != null) {
-            highlightedMoves = game.validMoves(highlightedPiece);
+            var selectedPiece = game.getBoard().getPiece(highlightedPiece);
+            if (selectedPiece != null) {
+                highlightedMoves = game.validMoves(highlightedPiece);
+            }
         }
         GamePrinter.printBoard(game.getBoard(), team, highlightedMoves);
     }
