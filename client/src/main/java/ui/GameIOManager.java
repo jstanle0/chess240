@@ -111,7 +111,13 @@ public class GameIOManager {
             if (cachedCommand.length == 3) {
                 return new ChessMove(parsePosition(cachedCommand[1]), parsePosition(cachedCommand[2]), null);
             } else if (cachedCommand.length == 4) {
-                return new ChessMove(parsePosition(cachedCommand[1]), parsePosition(cachedCommand[2]), ChessPiece.PieceType.valueOf(cachedCommand[3].toUpperCase()));
+                return new ChessMove(
+                        parsePosition(cachedCommand[1]),
+                        parsePosition(cachedCommand[2]),
+                        ChessPiece.PieceType.valueOf(
+                                cachedCommand[3].toUpperCase()
+                        )
+                );
             }
         }
 

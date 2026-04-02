@@ -17,11 +17,11 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WebSocketService {
-    private static final AuthDAO authDAO = DAOs.getAuthDAO();
-    private static final GameDAO gameDAO = DAOs.getGameDAO();
-    private static final Gson gson = new Gson();
+    private static final AuthDAO AUTH_DAO = DAOs.getAuthDAO();
+    private static final GameDAO GAME_DAO = DAOs.getGameDAO();
+    private static final Gson GSON = new Gson();
 
-    private static final ConcurrentHashMap<Integer, HashSet<Session>> connectionMap = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Integer, HashSet<Session>> CONNECTION_MAP = new ConcurrentHashMap<>();
 
     public static void handleCommand(UserGameCommand command, Session session) {
         switch (command.getCommandType()) {
@@ -66,9 +66,9 @@ public class WebSocketService {
             sendNotification(session, new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "This game has ended."));
         }
 
-        var connectionList = connectionMap.get(command.getGameID());
+        var connectionList = CONNECTION_MAP.get(command.getGameID());
         if (connectionList == null) {
-            connectionMap.put(command.getGameID(), new HashSet<>(Set.of(session)));
+            CONNECTION_MAP.put(command.getGameID(), new HashSet<>(Set.of(session)));
             return;
         }
 
@@ -143,9 +143,9 @@ public class WebSocketService {
             notificationState = GameNotificationState.CHECK;
         }
 
-        gameDAO.updateGameObject(command.getGameID(), game);
+        GAME_DAO.updateGameObject(command.getGameID(), game);
 
-        var sessionList = connectionMap.get(command.getGameID());
+        var sessionList = CONNECTION_MAP.get(command.getGameID());
         var message = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
         sendNotifications(sessionList, message);
         sendNotificationsToOthers(
@@ -182,11 +182,11 @@ public class WebSocketService {
         }
 
         if (Objects.equals(gameData.whiteUsername(), username)) {
-            gameDAO.updateGame(new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.gameName()));
+            GAME_DAO.updateGame(new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.gameName()));
         } else if (Objects.equals(gameData.blackUsername(), username)) {
-            gameDAO.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName()));
+            GAME_DAO.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName()));
         }
-        var connectionList = connectionMap.get(command.getGameID());
+        var connectionList = CONNECTION_MAP.get(command.getGameID());
         connectionList.remove(session);
         sendNotifications(connectionList, new ServerMessage(
                 ServerMessage.ServerMessageType.NOTIFICATION,
@@ -219,9 +219,9 @@ public class WebSocketService {
         var otherUsername = (teamColor == ChessGame.TeamColor.WHITE) ? gameData.blackUsername() : gameData.whiteUsername();
 
         game.disableGame();
-        gameDAO.updateGameObject(command.getGameID(), game);
+        GAME_DAO.updateGameObject(command.getGameID(), game);
 
-        var sessionList = connectionMap.get(command.getGameID());
+        var sessionList = CONNECTION_MAP.get(command.getGameID());
         sendNotifications(sessionList, new ServerMessage(
                 ServerMessage.ServerMessageType.NOTIFICATION,
                 username + " has resigned. " + otherUsername + " has won the game!")
@@ -254,7 +254,7 @@ public class WebSocketService {
 
     private static String authenticateUser(UserGameCommand command, Session session) {
         try {
-            return authDAO.getUsernameFromToken(UUID.fromString(command.getAuthToken()));
+            return AUTH_DAO.getUsernameFromToken(UUID.fromString(command.getAuthToken()));
         } catch (DataAccessException | IllegalArgumentException e) {
             sendError(session, "Login is invalid.");
             return null;
@@ -263,7 +263,7 @@ public class WebSocketService {
 
     private static ChessGame getGame(UserGameCommand command, Session session) {
         try {
-            return gameDAO.getGameObject(command.getGameID());
+            return GAME_DAO.getGameObject(command.getGameID());
         } catch (DataAccessException e) {
             sendError(session, "invalid game id");
             return null;
@@ -272,7 +272,7 @@ public class WebSocketService {
 
     private static GameData getGameData(UserGameCommand command, Session session) {
         try {
-            return gameDAO.getGame(command.getGameID());
+            return GAME_DAO.getGame(command.getGameID());
         } catch (DataAccessException e) {
             sendError(session, "Invalid game id");
             return null;
@@ -295,7 +295,7 @@ public class WebSocketService {
     private static void sendNotification(Session s, ServerMessage message) {
         if (s.isOpen()) {
             try {
-                s.getRemote().sendString(gson.toJson(message));
+                s.getRemote().sendString(GSON.toJson(message));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -306,7 +306,7 @@ public class WebSocketService {
         var message = new ServerMessage(ServerMessage.ServerMessageType.ERROR, messageString);
         if (session.isOpen()) {
             try {
-                session.getRemote().sendString(gson.toJson(message));
+                session.getRemote().sendString(GSON.toJson(message));
             } catch (IOException e) {
                 e.printStackTrace();
             }
