@@ -280,9 +280,7 @@ public class WebSocketService {
     }
 
     private static void sendNotifications(HashSet<Session> connections, ServerMessage message) {
-        connections.forEach((s) -> {
-            sendNotification(s, message);
-        });
+        connections.forEach((s) -> sendNotification(s, message));
     }
     private static void sendNotificationsToOthers(HashSet<Session> connections, ServerMessage message, Session currentSession) {
         connections.forEach((s) -> {
@@ -297,7 +295,7 @@ public class WebSocketService {
             try {
                 s.getRemote().sendString(GSON.toJson(message));
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Failed to send notification: " + e.getMessage());
             }
         }
     }
@@ -308,7 +306,7 @@ public class WebSocketService {
             try {
                 session.getRemote().sendString(GSON.toJson(message));
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Failed to send error: " + e.getMessage());
             }
         }
     }
